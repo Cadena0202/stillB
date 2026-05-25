@@ -220,8 +220,8 @@ const firebaseConfig={apiKey:"AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",authDomai
 const app=initializeApp(firebaseConfig),db=getFirestore(app);
 
 // ---- パスワード設定 ----
-const READ_PW  = 'story';      // 読む用（変えてください）
-const WRITE_PW = 'azul2024';   // 書く用（変えてください）
+const READ_PASSWORD  = 'remember';   // 読む用
+const WRITE_PASSWORD = 'azul2024';   // 書く用（自分だけ）
 
 let isOwner = false;
 let allEntries = [];
@@ -236,83 +236,196 @@ function unlock() {
   const ls = document.getElementById('lock-screen');
   const overlay = document.getElementById('loading-overlay');
   const bc = document.getElementById('bubble-canvas');
+
+  // 1. 画面を暗くする
+  ls.classList.add('hiding');
+  overlay.classList.add('active');
+
+  // 2. 泡アニメ開始
+  setTimeout(() => {
+    bc.classList.add('active');
+    startBubbles(bc);
+  }, 600);
+
+  // 3. ログ画面へ
+  setTimeout(() => {
+    bc.classList.remove('active');
+    ls.style.display = 'none';
+    overlay.style.transition = 'opacity 0.8s ease';
+    overlay.style.opacity = '0';
+    document.getElementById('main-content').classList.add('visible');
+    if (isOwner) document.getElementById('new-moon-btn').classList.add('show');
+    loadEntries();
+    setTimeout(() => { overlay.style.display = 'none'; }, 900);
+  }, 3000);
 }
 
-function checkPassword(){
-  const val=document.getElementById('pw-input').value;
-  const err=document.getElementById('pw-error');
-  if(val===WRITE_PW){unlock(true);}
-  else if(val===READ_PW){unlock(false);}
-  else{
-    err.textContent='the key does not fit.';
-    document.getElementById('pw-input').value='';
-    setTimeout(()=>{err.textContent='';},2500);
+function startBubbles(bc) {
+  const bctx = bc.getContext('2d');
+  bc.width  = window.innerWidth;
+  bc.height = window.innerHeight;
+  const BW = bc.width, BH = bc.height;
+
+  const bubbles = Array.from({length: 38}, (_, i) => ({
+    x: Math.random() * BW,
+    y: BH + Math.random() * 80 + 20,
+    r: Math.random() * 10 + 4,
+    speed: Math.random() * 2.2 + 1.0,
+    alpha: Math.random() * 0.35 + 0.12,
+    wobble: Math.random() * Math.PI * 2,
+    wobbleAmp: Math.random() * 1.8 + 0.5,
+    delay: i * 55,
+    born: false,
+    startTime: null,
+  }));
+
+  let startTime = null;
+  let running = true;
+
+  function animBubbles(ts) {
+    if (!running) return;
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    bctx.clearRect(0, 0, BW, BH);
+
+    for (const b of bubbles) {
+      if (!b.born && elapsed < b.delay) continue;
+      if (!b.born) { b.born = true; b.startTime = ts; }
+
+      const age = ts - b.startTime;
+      b.y -= b.speed;
+      b.wobble += 0.03;
+      const bx = b.x + Math.sin(b.wobble) * b.wobbleAmp;
+
+      if (b.y + b.r < 0) {
+        b.y = BH + b.r;
+        b.x = Math.random() * BW;
+      }
+
+      // 泡の描画
+      const grad = bctx.createRadialGradient(bx - b.r*0.3, b.y - b.r*0.3, b.r*0.1, bx, b.y, b.r);
+      grad.addColorStop(0,   `rgba(220,235,255,${b.alpha * 0.6})`);
+      grad.addColorStop(0.5, `rgba(180,210,255,${b.alpha * 0.25})`);
+      grad.addColorStop(1,   `rgba(140,185,240,${b.alpha * 0.08})`);
+
+      bctx.beginPath();
+      bctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
+      bctx.fillStyle = grad;
+      bctx.fill();
+
+      // 縁
+      bctx.beginPath();
+      bctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
+      bctx.strokeStyle = `rgba(200,225,255,${b.alpha * 0.40})`;
+      bctx.lineWidth = 0.7;
+      bctx.stroke();
+
+      // 光沢
+      bctx.beginPath();
+      bctx.arc(bx - b.r*0.28, b.y - b.r*0.28, b.r*0.22, 0, Math.PI*2);
+      bctx.fillStyle = `rgba(255,255,255,${b.alpha * 0.45})`;
+      bctx.fill();
+    }
+
+    if (elapsed < 2600) requestAnimationFrame(animBubbles);
+    else { bctx.clearRect(0,0,BW,BH); running = false; }
+  }
+
+  requestAnimationFrame(animBubbles);
+}
+
+function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  const err = document.getElementById('pw-error');
+  if (val === WRITE_PASSWORD) { isOwner = true; unlock(); }
+  else if (val === READ_PASSWORD) { isOwner = false; unlock(); }
+  else {
+    err.textContent = 'the key does not fit.';
+    document.getElementById('pw-input').value = '';
+    setTimeout(() => { err.textContent = ''; }, 2500);
   }
 }
 
-async function loadStories(){
-  const list=document.getElementById('story-list');
-  list.innerHTML='<div class="loading-note">— loading —</div>';
-  try{
-    const q=query(collection(db,'stories'),orderBy('createdAt','desc'));
-    const snap=await getDocs(q);
-    allStories=[];
-    snap.forEach(d=>allStories.push({id:d.id,...d.data()}));
-    renderStories();
-  }catch(e){list.innerHTML='<div class="empty-note">— まだ何も書かれていない —</div>';}
+async function loadEntries() {
+  const grid = document.getElementById('card-grid');
+  grid.innerHTML = '<div class="loading-note">— loading —</div>';
+  try {
+    const q = query(collection(db,'entries'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    allEntries = [];
+    snap.forEach(d => allEntries.push({ id: d.id, ...d.data() }));
+    renderCards();
+  } catch(e) {
+    grid.innerHTML = '<div class="empty-note">— 読み込みに失敗しました —</div>';
+  }
 }
 
-function renderStories(){
-  const list=document.getElementById('story-list');
-  list.innerHTML='';
-  if(allStories.length===0){list.innerHTML='<div class="empty-note">— まだ何も書かれていない —</div>';return;}
-  allStories.forEach((s,i)=>{
-    const el=document.createElement('div');
-    el.className='story-item';
-    el.style.animationDelay=`${i*0.06}s`;
-    el.innerHTML=`<span class="story-num">${String(allStories.length-i).padStart(2,'0')}.</span><div class="story-info"><div class="story-title">${escHtml(s.title||'— 無題 —')}</div><div class="story-desc">${escHtml(s.desc||'')}</div></div><span class="story-arrow">→</span>`;
-    el.addEventListener('click',()=>openStory(s));
-    list.appendChild(el);
+function renderCards() {
+  const grid = document.getElementById('card-grid');
+  const filtered = currentCat === 'all' ? allEntries : allEntries.filter(e => e.category === currentCat);
+  grid.innerHTML = '';
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-note">— まだ何も書かれていない —</div>';
+    return;
+  }
+  filtered.forEach((entry, i) => {
+    const card = document.createElement('div');
+    card.className = 'log-card';
+    card.style.animationDelay = `${i * 0.07}s`;
+    const preview = (entry.body || '').slice(0, 40);
+    const dotClass = `dot-${entry.category || 'all'}`;
+    card.innerHTML = `
+      <div class="card-meta">
+        <span class="card-date">${escHtml(entry.date || '')}</span>
+      </div>
+      <div class="card-title">${escHtml(entry.title || '— 無題 —')}</div>
+      <div class="card-body">${escHtml(preview)}</div>
+      <div class="card-cat-dot ${dotClass}"></div>
+    `;
+    card.addEventListener('click', () => openDetail(entry));
+    grid.appendChild(card);
   });
 }
 
-function openStory(s){
-  currentStoryId=s.id;
-  document.getElementById('story-modal-title').textContent=s.title||'— 無題 —';
-  document.getElementById('story-modal-meta').textContent=s.date||'';
-  document.getElementById('story-modal-body').textContent=s.body||'';
-  const del=document.getElementById('story-modal-delete');
-  isOwner?del.classList.add('show'):del.classList.remove('show');
-  document.getElementById('story-modal').classList.add('open');
+function openDetail(entry) {
+  currentEntryId = entry.id;
+  document.getElementById('modal-date').textContent = entry.date || '';
+  document.getElementById('modal-title').textContent = entry.title || '— 無題 —';
+  document.getElementById('modal-body').textContent = entry.body || '';
+  const del = document.getElementById('modal-delete');
+  if (isOwner) del.classList.add('show'); else del.classList.remove('show');
+  document.getElementById('detail-modal').classList.add('open');
 }
 
-async function deleteStory(){
-  if(!isOwner||!currentStoryId)return;
-  try{
-    await deleteDoc(doc(db,'stories',currentStoryId));
-    document.getElementById('story-modal').classList.remove('open');
-    allStories=allStories.filter(s=>s.id!==currentStoryId);
-    currentStoryId=null;renderStories();
-  }catch(e){alert('削除に失敗しました。');}
+async function deleteCurrentEntry() {
+  if (!isOwner || !currentEntryId) return;
+  try {
+    await deleteDoc(doc(db,'entries',currentEntryId));
+    document.getElementById('detail-modal').classList.remove('open');
+    allEntries = allEntries.filter(e => e.id !== currentEntryId);
+    currentEntryId = null;
+    renderCards();
+  } catch(e) { alert('削除に失敗しました。'); }
 }
 
-async function postStory(){
-  if(!isOwner)return;
-  const title=document.getElementById('story-title-input').value.trim();
-  const desc=document.getElementById('story-desc-input').value.trim();
-  const body=document.getElementById('story-body-input').value.trim();
-  if(!body)return;
-  const now=new Date();
-  const date=now.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-  try{
-    const ref=await addDoc(collection(db,'stories'),{title:title||'— 無題 —',desc,body,date,createdAt:now.getTime()});
-    allStories.unshift({id:ref.id,title:title||'— 無題 —',desc,body,date,createdAt:now.getTime()});
-    document.getElementById('story-title-input').value='';
-    document.getElementById('story-desc-input').value='';
-    document.getElementById('story-body-input').value='';
+async function postEntry() {
+  if (!isOwner) return;
+  const title = document.getElementById('entry-title-input').value.trim();
+  const body  = document.getElementById('entry-body-input').value.trim();
+  const cat   = document.getElementById('entry-cat-input').value;
+  if (!body) return;
+  const now = new Date();
+  const date = now.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  try {
+    const docRef = await addDoc(collection(db,'entries'), {
+      title: title||'— 無題 —', body, date, category: cat, createdAt: now.getTime()
+    });
+    allEntries.unshift({ id: docRef.id, title: title||'— 無題 —', body, date, category: cat, createdAt: now.getTime() });
+    document.getElementById('entry-title-input').value = '';
+    document.getElementById('entry-body-input').value = '';
     document.getElementById('post-modal').classList.remove('open');
-    renderStories();
-  }catch(e){alert('投稿に失敗しました。');}
+    renderCards();
+  } catch(e) { alert('投稿に失敗しました。'); }
 }
 
 // 右上鍵アイコン（オーナー昇格）
