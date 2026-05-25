@@ -3,116 +3,388 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Story — Remember the promise.</title>
-<link href="fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+<title>Log — Remember the promise.</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --mustard:#c8a93a; --text:rgba(220,230,245,0.78); --text-dim:rgba(170,190,215,0.48); }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:100%;min-height:100vh;background:#0c1019;color:var(--text);font-family:'Shippori Mincho',serif;overflow-x:hidden;}
-  #bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
-  .corner{position:fixed;width:16px;height:16px;border-style:solid;z-index:50;pointer-events:none;opacity:0.28;}
-  .corner-tl{top:14px;left:14px;border-color:rgba(200,220,255,0.55);border-width:1px 0 0 1px;}
-  .corner-tr{top:14px;right:14px;border-color:rgba(200,220,255,0.55);border-width:1px 1px 0 0;}
-  .corner-bl{bottom:14px;left:14px;border-color:rgba(200,220,255,0.55);border-width:0 0 1px 1px;}
-  .corner-br{bottom:14px;right:14px;border-color:rgba(200,220,255,0.55);border-width:0 1px 1px 0;}
+  :root {
+    --mustard: #c8a93a;
+    --text: rgba(220,230,245,0.78);
+    --text-dim: rgba(170,190,215,0.48);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: #0c1019; color: var(--text);
+    font-family: 'Shippori Mincho', serif;
+    overflow-x: hidden;
+  }
+  #bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
-  /* パスワードオーバーレイ */
-  #lock-overlay{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(6,10,18,0.96);backdrop-filter:blur(12px);transition:opacity 1s ease;}
-  #lock-overlay.hiding{opacity:0;pointer-events:none;}
-  .lock-box{display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0;animation:fadein 1.2s ease 0.3s forwards;}
-  .lock-icon{font-size:22px;opacity:0.30;}
-  .lock-title{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;color:rgba(210,225,255,0.38);letter-spacing:0.22em;}
-  .lock-input{background:transparent;border:none;border-bottom:1px solid rgba(200,220,255,0.22);color:rgba(220,232,255,0.72);font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:0.35em;padding:6px 4px;width:200px;text-align:center;outline:none;transition:border-color 0.4s;text-shadow:0 0 10px rgba(160,200,255,0.28);}
-  .lock-input:focus{border-color:rgba(200,220,255,0.42);}
-  .lock-input::placeholder{color:rgba(200,220,255,0.14);font-style:italic;font-size:13px;}
-  .lock-error{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(220,140,140,0.55);letter-spacing:0.15em;min-height:16px;}
-  .lock-hint{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:10px;color:rgba(200,220,255,0.16);letter-spacing:0.22em;}
+  /* 四隅 */
+  .corner {
+    position: fixed; width: 16px; height: 16px;
+    border-style: solid; z-index: 50; pointer-events: none; opacity: 0.30;
+  }
+  .corner-tl { top: 14px; left: 14px;  border-color: rgba(200,220,255,0.50); border-width: 1px 0 0 1px; }
+  .corner-tr { top: 14px; right: 14px; border-color: rgba(200,220,255,0.50); border-width: 1px 1px 0 0; }
+  .corner-bl { bottom: 14px; left: 14px;  border-color: rgba(200,220,255,0.50); border-width: 0 0 1px 1px; }
+  .corner-br { bottom: 14px; right: 14px; border-color: rgba(200,220,255,0.50); border-width: 0 1px 1px 0; }
 
-  /* メイン */
-  #main-content{display:none;position:relative;z-index:10;min-height:100vh;flex-direction:column;}
-  #main-content.visible{display:flex;}
+  /* ===== パスワード画面 ===== */
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 40;
+    display: flex; flex-direction: column; align-items: center;
+    pointer-events: auto;
+    transition: opacity 1.2s ease;
+  }
+  #lock-screen.hiding { opacity: 0; pointer-events: none; }
 
-  header{padding:22px 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,220,255,0.07);position:relative;z-index:20;}
-  .site-title{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;color:rgba(210,225,255,0.40);letter-spacing:0.18em;text-decoration:none;}
-  nav{display:flex;gap:28px;align-items:center;}
-  nav a{font-family:'Cormorant Garamond',serif;font-size:11px;color:rgba(160,185,220,0.38);text-decoration:none;letter-spacing:0.22em;text-transform:uppercase;transition:color 0.3s;position:relative;}
-  nav a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--mustard);transition:width 0.3s;opacity:0.5;}
-  nav a:hover{color:rgba(200,215,255,0.70);}
-  nav a:hover::after{width:100%;}
-  nav a.active{color:rgba(200,169,58,0.60);}
+  /* 月（上部固定） */
+  #moon {
+    position: absolute;
+    top: 18%; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 36px; border-radius: 50%;
+    background: radial-gradient(circle at 44% 42%,
+      rgba(255,255,255,0.98) 0%,
+      rgba(240,245,255,0.90) 55%,
+      rgba(200,218,255,0.55) 100%
+    );
+    box-shadow:
+      0 0 16px 7px rgba(200,220,255,0.30),
+      0 0 50px 20px rgba(180,210,255,0.13),
+      0 0 110px 55px rgba(160,200,255,0.06);
+    -webkit-mask: radial-gradient(circle at 63% 35%, transparent 28%, black 30%);
+    mask: radial-gradient(circle at 63% 35%, transparent 28%, black 30%);
+    animation: moonpulse 5s ease-in-out infinite;
+    cursor: default;
+  }
+  @keyframes moonpulse {
+    0%,100% { transform: translateX(-50%) scale(1); }
+    50%      { transform: translateX(-50%) scale(1.05); }
+  }
 
-  /* 鍵アイコン（右上） */
-  #lock-icon-btn{font-size:16px;opacity:0.30;cursor:pointer;transition:opacity 0.3s;background:none;border:none;color:inherit;}
-  #lock-icon-btn:hover{opacity:0.65;}
+  /* パスワード入力エリア（月の下、海面の上） */
+  .lock-form {
+    position: absolute;
+    top: 32%; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    opacity: 0; animation: fadein 1.8s ease 0.5s forwards;
+  }
+  .lock-input {
+    background: transparent; border: none;
+    border-bottom: 1px solid rgba(200,220,255,0.25);
+    color: rgba(220,232,255,0.75);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; letter-spacing: 0.35em;
+    padding: 6px 4px; width: 200px; text-align: center; outline: none;
+    transition: border-color 0.4s;
+    text-shadow: 0 0 10px rgba(160,200,255,0.35);
+  }
+  .lock-input:focus { border-color: rgba(200,220,255,0.45); }
+  .lock-input::placeholder { color: rgba(200,220,255,0.16); font-style: italic; font-size: 13px; letter-spacing: 0.22em; }
+  .lock-error {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(220,140,140,0.55); letter-spacing: 0.15em; min-height: 16px;
+  }
+  .lock-hint {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 10px; color: rgba(200,220,255,0.18); letter-spacing: 0.22em;
+  }
 
-  /* ストーリーリスト */
-  .story-wrap{max-width:720px;margin:0 auto;padding:36px 28px 100px;width:100%;position:relative;z-index:10;}
-  .story-header{margin-bottom:40px;display:flex;align-items:baseline;gap:18px;}
-  .story-header h1{font-family:'IM Fell English',serif;font-style:italic;font-size:24px;color:rgba(210,225,255,0.62);letter-spacing:0.08em;}
-  .story-header-line{flex:1;height:1px;background:linear-gradient(to right,rgba(200,220,255,0.14),transparent);}
+  /* ===== メインコンテンツ ===== */
+  #main-content { display: none; position: relative; z-index: 10; min-height: 100vh; flex-direction: column; }
+  #main-content.visible { display: flex; }
 
-  .story-list{display:flex;flex-direction:column;gap:0;}
-  .story-item{border-bottom:1px solid rgba(200,220,255,0.07);padding:22px 6px;display:flex;align-items:baseline;gap:20px;cursor:pointer;transition:background 0.25s;opacity:0;transform:translateY(6px);animation:cardrise 0.55s ease forwards;position:relative;}
-  .story-item:hover{background:rgba(200,220,255,0.03);}
-  @keyframes cardrise{to{opacity:1;transform:translateY(0);}}
-  .story-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(200,169,58,0.35);letter-spacing:0.15em;min-width:28px;}
-  .story-info{flex:1;}
-  .story-title{font-family:'IM Fell English',serif;font-size:16px;color:rgba(210,225,255,0.65);letter-spacing:0.06em;margin-bottom:6px;}
-  .story-desc{font-size:12px;color:rgba(180,205,235,0.40);line-height:1.8;letter-spacing:0.03em;}
-  .story-arrow{font-size:12px;color:rgba(200,220,255,0.20);transition:color 0.3s,transform 0.3s;}
-  .story-item:hover .story-arrow{color:rgba(200,220,255,0.50);transform:translateX(4px);}
+  header {
+    padding: 24px 40px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(200,220,255,0.07); position: relative; z-index: 20;
+  }
+  .site-title {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 14px; color: rgba(210,225,255,0.42); letter-spacing: 0.18em; text-decoration: none;
+  }
+  nav { display: flex; gap: 32px; }
+  nav a {
+    font-family: 'Cormorant Garamond', serif; font-size: 11px;
+    color: rgba(160,185,220,0.38); text-decoration: none;
+    letter-spacing: 0.22em; text-transform: uppercase; transition: color 0.3s; position: relative;
+  }
+  nav a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0;
+    width: 0; height: 1px; background: var(--mustard); transition: width 0.3s; opacity: 0.5;
+  }
+  nav a:hover { color: rgba(200,215,255,0.70); }
+  nav a:hover::after { width: 100%; }
+  nav a.active { color: rgba(200,169,58,0.60); }
+
+  /* ===== ログ一覧エリア ===== */
+  .log-wrap {
+    max-width: 820px; margin: 0 auto; padding: 36px 32px 100px; width: 100%;
+    position: relative;
+  }
+
+  /* カテゴリフィルター */
+  .category-bar {
+    display: flex; align-items: center; gap: 0; margin-bottom: 32px;
+  }
+  .cat-btn {
+    background: rgba(20,28,44,0.80); border: 1px solid rgba(200,220,255,0.10);
+    color: rgba(160,185,220,0.45); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.20em; padding: 7px 18px;
+    cursor: pointer; transition: all 0.3s; border-right: none;
+  }
+  .cat-btn:last-of-type { border-right: 1px solid rgba(200,220,255,0.10); }
+  .cat-btn:first-child { border-radius: 3px 0 0 3px; }
+  .cat-btn:last-of-type { border-radius: 0 3px 3px 0; }
+  .cat-btn.active {
+    background: rgba(200,220,255,0.12);
+    color: rgba(210,228,255,0.80);
+    border-color: rgba(200,220,255,0.22);
+  }
+  .cat-btn:hover:not(.active) {
+    background: rgba(200,220,255,0.06);
+    color: rgba(200,215,255,0.65);
+  }
+  .cat-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, rgba(200,220,255,0.12), transparent);
+    margin-left: 16px;
+  }
+
+  /* カードグリッド */
+  .card-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+
+  .log-card {
+    background: rgba(14,20,34,0.65);
+    border: 1px solid rgba(200,220,255,0.09);
+    padding: 18px 16px 14px;
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: border-color 0.3s, background 0.3s, transform 0.25s;
+    opacity: 0; transform: translateY(8px);
+    animation: cardrise 0.6s ease forwards;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .log-card:hover {
+    border-color: rgba(200,220,255,0.20);
+    background: rgba(18,26,44,0.80);
+    transform: translateY(-2px);
+  }
+
+  @keyframes cardrise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-meta {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  }
+  .card-date {
+    font-family: 'Cormorant Garamond', serif; font-size: 10px;
+    color: rgba(160,185,220,0.40); letter-spacing: 0.12em;
+  }
+  .card-title {
+    font-family: 'IM Fell English', serif; font-size: 15px;
+    color: rgba(210,225,255,0.68); letter-spacing: 0.06em;
+    line-height: 1.4; writing-mode: vertical-rl;
+    max-height: 72px; overflow: hidden;
+    position: absolute; right: 14px; top: 14px;
+  }
+  .card-body {
+    font-size: 12px; line-height: 1.9; color: rgba(180,205,235,0.45);
+    letter-spacing: 0.03em;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden; padding-right: 28px;
+  }
+
+  /* カテゴリ色の丸（左下） */
+  .card-cat-dot {
+    position: absolute; bottom: 0; left: 0;
+    width: 28px; height: 28px; border-radius: 0 28px 0 0;
+  }
+  .dot-to   { background: rgba(90,180,240,0.35); }
+  .dot-me   { background: rgba(140,100,200,0.30); }
+  .dot-all  { background: rgba(180,180,180,0.20); }
 
   /* 詳細モーダル */
-  #story-modal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,10,18,0.93);backdrop-filter:blur(10px);align-items:flex-start;justify-content:center;padding:48px 24px;overflow-y:auto;}
-  #story-modal.open{display:flex;}
-  .story-modal-inner{max-width:640px;width:100%;border-left:1px solid rgba(200,220,255,0.12);padding:36px 42px;position:relative;}
-  .story-modal-title{font-family:'IM Fell English',serif;font-size:22px;color:rgba(210,225,255,0.70);letter-spacing:0.08em;margin-bottom:8px;}
-  .story-modal-meta{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(200,169,58,0.38);letter-spacing:0.18em;margin-bottom:28px;}
-  .story-modal-body{font-size:14px;line-height:2.4;color:rgba(190,210,240,0.60);letter-spacing:0.05em;white-space:pre-wrap;}
-  .story-modal-close{position:absolute;top:14px;right:14px;background:transparent;border:none;color:rgba(200,220,255,0.20);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.20em;cursor:pointer;transition:color 0.3s;}
-  .story-modal-close:hover{color:rgba(200,220,255,0.50);}
-  .story-modal-delete{margin-top:28px;background:transparent;border:none;color:rgba(220,120,120,0.16);font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:0.20em;cursor:pointer;transition:color 0.3s;display:none;}
-  .story-modal-delete.show{display:inline;}
-  .story-modal-delete:hover{color:rgba(220,120,120,0.45);}
+  #detail-modal {
+    display: none; position: fixed; inset: 0; z-index: 60;
+    background: rgba(6,10,18,0.92); backdrop-filter: blur(10px);
+    align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+  #detail-modal.open { display: flex; }
+  .modal-inner {
+    max-width: 600px; width: 100%;
+    border-left: 1px solid rgba(200,220,255,0.14);
+    padding: 36px 40px;
+    position: relative;
+    max-height: 80vh; overflow-y: auto;
+  }
+  .modal-date {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(200,169,58,0.42); letter-spacing: 0.20em; margin-bottom: 14px;
+  }
+  .modal-title {
+    font-family: 'IM Fell English', serif; font-size: 20px;
+    color: rgba(210,225,255,0.72); letter-spacing: 0.06em; margin-bottom: 22px;
+  }
+  .modal-body {
+    font-size: 14px; line-height: 2.2; color: rgba(190,210,240,0.60);
+    letter-spacing: 0.04em; white-space: pre-wrap;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: transparent; border: none;
+    color: rgba(200,220,255,0.25); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.20em; cursor: pointer; transition: color 0.3s;
+  }
+  .modal-close:hover { color: rgba(200,220,255,0.55); }
+  .modal-delete {
+    margin-top: 28px; background: transparent; border: none;
+    color: rgba(220,120,120,0.20); font-family: 'Cormorant Garamond', serif;
+    font-size: 10px; letter-spacing: 0.20em; cursor: pointer; transition: color 0.3s; display: none;
+  }
+  .modal-delete.show { display: inline; }
+  .modal-delete:hover { color: rgba(220,120,120,0.50); }
 
-  /* 投稿モーダル */
-  #post-modal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,10,18,0.93);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:40px 24px;}
-  #post-modal.open{display:flex;}
-  .post-inner{max-width:560px;width:100%;border-left:1px solid rgba(200,169,58,0.15);padding:34px 38px;position:relative;display:flex;flex-direction:column;gap:13px;}
-  .post-label{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(200,169,58,0.36);letter-spacing:0.20em;}
-  .form-input,.form-textarea{background:rgba(4,8,18,0.55);border:none;border-bottom:1px solid rgba(200,220,255,0.14);color:rgba(210,225,255,0.75);font-family:'Shippori Mincho',serif;font-size:14px;padding:8px 4px;outline:none;resize:none;line-height:1.9;letter-spacing:0.04em;transition:border-color 0.3s;width:100%;}
-  .form-textarea{min-height:200px;}
-  .form-input:focus,.form-textarea:focus{border-color:rgba(200,220,255,0.28);}
-  .form-input::placeholder,.form-textarea::placeholder{color:rgba(160,185,220,0.17);font-style:italic;}
-  .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;}
-  .btn-post{background:transparent;border:1px solid rgba(200,169,58,0.25);color:rgba(200,169,58,0.60);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;padding:7px 20px;cursor:pointer;transition:all 0.3s;}
-  .btn-post:hover{border-color:rgba(200,169,58,0.46);color:rgba(200,169,58,0.82);}
-  .btn-cancel{background:transparent;border:1px solid rgba(200,220,255,0.09);color:rgba(160,185,220,0.28);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;padding:7px 20px;cursor:pointer;transition:all 0.3s;}
-  .btn-cancel:hover{border-color:rgba(200,220,255,0.18);color:rgba(160,185,220,0.55);}
-  .post-close{position:absolute;top:14px;right:14px;background:transparent;border:none;color:rgba(200,220,255,0.18);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.20em;cursor:pointer;transition:color 0.3s;}
-  .post-close:hover{color:rgba(200,220,255,0.45);}
+  /* 投稿フォームモーダル */
+  #post-modal {
+    display: none; position: fixed; inset: 0; z-index: 60;
+    background: rgba(6,10,18,0.92); backdrop-filter: blur(10px);
+    align-items: center; justify-content: center; padding: 40px 24px;
+  }
+  #post-modal.open { display: flex; }
+  .post-inner {
+    max-width: 560px; width: 100%;
+    border-left: 1px solid rgba(200,169,58,0.18);
+    padding: 36px 40px; position: relative;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .post-title-label {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(200,169,58,0.40); letter-spacing: 0.20em; margin-bottom: 4px;
+  }
+  .form-input, .form-textarea, .form-select {
+    background: rgba(4,8,18,0.55); border: none;
+    border-bottom: 1px solid rgba(200,220,255,0.16);
+    color: rgba(210,225,255,0.78); font-family: 'Shippori Mincho', serif;
+    font-size: 14px; padding: 8px 4px; outline: none; resize: none;
+    line-height: 1.9; letter-spacing: 0.04em; transition: border-color 0.3s; width: 100%;
+  }
+  .form-textarea { min-height: 130px; }
+  .form-select {
+    cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+    color: rgba(200,215,255,0.60);
+  }
+  .form-select option { background: #0e1520; }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: rgba(200,220,255,0.32); }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(160,185,220,0.20); font-style: italic; }
+  .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 4px; }
+  .btn-post {
+    background: transparent; border: 1px solid rgba(200,169,58,0.28);
+    color: rgba(200,169,58,0.65); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 8px 22px; cursor: pointer; transition: all 0.3s;
+  }
+  .btn-post:hover { border-color: rgba(200,169,58,0.50); color: rgba(200,169,58,0.88); background: rgba(200,169,58,0.04); }
+  .btn-cancel {
+    background: transparent; border: 1px solid rgba(200,220,255,0.10);
+    color: rgba(160,185,220,0.33); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 8px 22px; cursor: pointer; transition: all 0.3s;
+  }
+  .btn-cancel:hover { border-color: rgba(200,220,255,0.22); color: rgba(160,185,220,0.60); }
+  .post-close {
+    position: absolute; top: 16px; right: 16px;
+    background: transparent; border: none;
+    color: rgba(200,220,255,0.22); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.20em; cursor: pointer; transition: color 0.3s;
+  }
+  .post-close:hover { color: rgba(200,220,255,0.50); }
 
-  /* 新月ボタン */
-  #new-moon-btn{display:none;position:fixed;bottom:30px;right:32px;z-index:30;width:34px;height:34px;border-radius:50%;cursor:pointer;background:radial-gradient(circle at 30% 35%,rgba(30,34,44,0.95),rgba(10,12,18,0.98));border:1px solid rgba(200,220,255,0.10);box-shadow:0 2px 12px rgba(0,0,0,0.50);transition:box-shadow 0.3s,transform 0.3s;-webkit-mask:radial-gradient(circle at 68% 38%,transparent 32%,black 34%);mask:radial-gradient(circle at 68% 38%,transparent 32%,black 34%);}
-  #new-moon-btn:hover{transform:scale(1.08);}
-  #new-moon-btn.show{display:block;}
+  /* 新月ボタン（右下・オーナーのみ） */
+  #new-moon-btn {
+    display: none; position: fixed; bottom: 32px; right: 36px; z-index: 30;
+    width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+    background: radial-gradient(circle at 30% 35%, rgba(30,34,44,0.95), rgba(10,12,18,0.98));
+    border: 1px solid rgba(200,220,255,0.12);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.50), 0 0 24px rgba(200,220,255,0.05);
+    transition: box-shadow 0.3s, transform 0.3s;
+    /* 新月: 右側だけ少し欠けてる感じ */
+    -webkit-mask: radial-gradient(circle at 68% 38%, transparent 32%, black 34%);
+    mask: radial-gradient(circle at 68% 38%, transparent 32%, black 34%);
+  }
+  #new-moon-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 3px 18px rgba(0,0,0,0.60), 0 0 36px rgba(200,220,255,0.10);
+  }
+  #new-moon-btn.show { display: block; }
 
-  #back-top{display:flex;justify-content:center;padding:14px 0 54px;}
-  #back-top-btn{width:13px;height:13px;border-radius:50%;background:rgba(200,220,255,0.22);border:none;cursor:pointer;transition:background 0.3s,transform 0.3s;display:block;}
-  #back-top-btn:hover{background:rgba(200,220,255,0.45);transform:scale(1.2);}
+  /* TOPに戻る（下部中央の黒丸） */
+  #back-top {
+    display: flex; justify-content: center; padding: 20px 0 60px;
+  }
+  #back-top-btn {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(200,220,255,0.28); border: none; cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    display: block;
+  }
+  #back-top-btn:hover { background: rgba(200,220,255,0.50); transform: scale(1.2); }
 
-  .side-bar{position:fixed;right:9px;top:50%;transform:translateY(-50%);width:1px;height:33vh;background:linear-gradient(to bottom,transparent,rgba(200,220,255,0.13) 30%,rgba(200,220,255,0.13) 70%,transparent);z-index:5;pointer-events:none;}
+  /* 右側装飾バー */
+  .side-bar {
+    position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 35vh;
+    background: linear-gradient(to bottom, transparent, rgba(200,220,255,0.15) 30%, rgba(200,220,255,0.15) 70%, transparent);
+    z-index: 5; pointer-events: none;
+  }
 
-  .empty-note,.loading-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:rgba(160,185,220,0.20);letter-spacing:0.15em;text-align:center;padding:60px 0;}
+  .empty-note, .loading-note {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 12px; color: rgba(160,185,220,0.22); letter-spacing: 0.15em;
+    text-align: center; padding: 60px 0; grid-column: 1 / -1;
+  }
 
-  footer{padding:18px 36px;border-top:1px solid rgba(200,220,255,0.05);display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:10;}
-  .footer-line{flex:1;max-width:80px;height:1px;}
-  .footer-line.blue{background:linear-gradient(to right,transparent,rgba(200,220,255,0.12));}
-  .footer-line.gold{background:linear-gradient(to left,transparent,rgba(200,169,58,0.12));}
-  .footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:10px;color:rgba(160,185,220,0.17);letter-spacing:0.20em;}
+  footer {
+    padding: 20px 40px; border-top: 1px solid rgba(200,220,255,0.05);
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+  }
+  .footer-line { flex: 1; max-width: 90px; height: 1px; }
+  .footer-line.blue { background: linear-gradient(to right, transparent, rgba(200,220,255,0.14)); }
+  .footer-line.gold { background: linear-gradient(to left,  transparent, rgba(200,169,58,0.14)); }
+  .footer-text {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 10px; color: rgba(160,185,220,0.20); letter-spacing: 0.20em;
+  }
 
-  @keyframes fadein{to{opacity:1;}}
-  @media(max-width:580px){header{padding:16px 18px;}.story-wrap{padding:26px 16px 100px;}}
+  @keyframes fadein { to { opacity: 1; } }
+
+  /* ===== ローディング（泡） ===== */
+  #loading-overlay {
+    position: fixed; inset: 0; z-index: 55;
+    background: rgba(4,6,12,0);
+    pointer-events: none;
+    transition: background 0.8s ease;
+  }
+  #loading-overlay.active {
+    background: rgba(4,6,12,0.96);
+    pointer-events: auto;
+  }
+  #bubble-canvas {
+    position: fixed; inset: 0; z-index: 56; pointer-events: none;
+    opacity: 0; transition: opacity 0.4s ease;
+  }
+  #bubble-canvas.active { opacity: 1; }
+
+
+  @media (max-width: 580px) {
+    .card-grid { grid-template-columns: 1fr; }
+    header { padding: 18px 20px; }
+    .log-wrap { padding: 28px 18px 100px; }
+  }
 </style>
 </head>
 <body>
@@ -123,39 +395,50 @@
 <div class="corner corner-bl"></div>
 <div class="corner corner-br"></div>
 
-<!-- パスワードオーバーレイ -->
-<div id="lock-overlay">
-  <div class="lock-box">
-    <div class="lock-icon">🔒</div>
-    <div class="lock-title">enter the password</div>
-    <input class="lock-input" type="password" id="pw-input" placeholder="· · · · · ·" autocomplete="off" />
+<!-- ローディングオーバーレイ -->
+<div id="loading-overlay"></div>
+<canvas id="bubble-canvas"></canvas>
+
+<!-- ===== パスワード画面 ===== -->
+<div id="lock-screen">
+  <div id="moon"></div>
+  <div class="lock-form">
+    <input class="lock-input" type="password" id="pw-input" placeholder="password" autocomplete="off" />
     <div class="lock-error" id="pw-error"></div>
     <div class="lock-hint">— press enter —</div>
   </div>
 </div>
 
-<!-- メイン -->
+<!-- ===== メインコンテンツ ===== -->
 <div id="main-content">
   <header>
     <a href="index.html" class="site-title">Remember the promise.</a>
     <nav>
-      <a href="diary.html">Log</a>
-      <a href="story.html" class="active">Story</a>
-      <button id="lock-icon-btn" title="write password">🔒</button>
+      <a href="index.html">Top</a>
+      <a href="diary.html" class="active">Log</a>
     </nav>
   </header>
 
   <div class="side-bar"></div>
 
-  <div class="story-wrap">
-    <div class="story-header">
-      <h1>Story</h1>
-      <div class="story-header-line"></div>
+  <div class="log-wrap">
+    <!-- カテゴリフィルター -->
+    <div class="category-bar">
+      <button class="cat-btn" data-cat="to">to</button>
+      <button class="cat-btn" data-cat="me">me</button>
+      <button class="cat-btn active" data-cat="all">all</button>
+      <div class="cat-line"></div>
     </div>
-    <div class="story-list" id="story-list">
+
+    <!-- カードグリッド -->
+    <div class="card-grid" id="card-grid">
       <div class="loading-note">— loading —</div>
     </div>
-    <div id="back-top"><button id="back-top-btn"></button></div>
+
+    <!-- TOPに戻る -->
+    <div id="back-top">
+      <button id="back-top-btn" title="Top へ戻る"></button>
+    </div>
   </div>
 
   <footer>
@@ -166,24 +449,28 @@
 </div>
 
 <!-- 詳細モーダル -->
-<div id="story-modal">
-  <div class="story-modal-inner">
-    <button class="story-modal-close" id="story-modal-close">close</button>
-    <div class="story-modal-title" id="story-modal-title"></div>
-    <div class="story-modal-meta" id="story-modal-meta"></div>
-    <div class="story-modal-body" id="story-modal-body"></div>
-    <button class="story-modal-delete" id="story-modal-delete">delete</button>
+<div id="detail-modal">
+  <div class="modal-inner">
+    <button class="modal-close" id="modal-close">close</button>
+    <div class="modal-date" id="modal-date"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-delete" id="modal-delete">delete</button>
   </div>
 </div>
 
-<!-- 投稿モーダル -->
+<!-- 投稿フォームモーダル -->
 <div id="post-modal">
   <div class="post-inner">
     <button class="post-close" id="post-close">close</button>
-    <div class="post-label">new story</div>
-    <input class="form-input" type="text" id="story-title-input" placeholder="title" />
-    <input class="form-input" type="text" id="story-desc-input" placeholder="short description (optional)" />
-    <textarea class="form-textarea" id="story-body-input" placeholder="お話を書いてください。"></textarea>
+    <div class="post-title-label">new entry</div>
+    <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
+    <select class="form-select" id="entry-cat-input">
+      <option value="to">to</option>
+      <option value="me">me</option>
+      <option value="all">all</option>
+    </select>
+    <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
     <div class="form-actions">
       <button class="btn-cancel" id="btn-cancel">Cancel</button>
       <button class="btn-post" id="btn-post">Post</button>
@@ -191,33 +478,106 @@
   </div>
 </div>
 
-<div id="new-moon-btn" title="New story"></div>
+<!-- 新月ボタン（オーナー投稿用） -->
+<div id="new-moon-btn" title="New entry"></div>
 
+<!-- 背景Canvas -->
 <script>
-const canvas=document.getElementById('bg'),ctx=canvas.getContext('2d');
-let W,H;
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-resize();window.addEventListener('resize',resize);
-const SNOW=Array.from({length:40},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.4+0.3,speed:Math.random()*0.00008+0.00003,alpha:Math.random()*0.24+0.05,wobble:Math.random()*Math.PI*2,ws:Math.random()*0.0007+0.0002}));
-function draw(t){
-  ctx.clearRect(0,0,W,H);
-  const bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#1a2130');bg.addColorStop(0.5,'#111822');bg.addColorStop(1,'#070b12');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  for(const p of SNOW){p.y-=p.speed;p.wobble+=p.ws;if(p.y<-0.02){p.y=1.02;p.x=Math.random();}
-    const px=(p.x+Math.sin(p.wobble)*0.013)*W,py=p.y*H;
-    ctx.beginPath();ctx.arc(px,py,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,220,255,${p.alpha*(0.25+p.y*0.75)})`;ctx.fill();}
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const SNOW_COUNT = 48;
+const snow = Array.from({length: SNOW_COUNT}, () => ({
+  x: Math.random(), y: Math.random(),
+  r: Math.random() * 1.6 + 0.3,
+  speed: Math.random() * 0.00009 + 0.00003,
+  alpha: Math.random() * 0.28 + 0.06,
+  wobble: Math.random() * Math.PI * 2,
+  wobbleSpeed: Math.random() * 0.0008 + 0.0002,
+}));
+
+const WAVE_POINTS = 90;
+function drawWave(t, yBase, amp, speed, color) {
+  ctx.beginPath();
+  for (let i = 0; i <= WAVE_POINTS; i++) {
+    const x = (i / WAVE_POINTS) * W;
+    const y = yBase
+      + Math.sin(i * 0.16 + t * speed) * amp
+      + Math.sin(i * 0.08 + t * speed * 0.65 + 1.3) * amp * 0.45
+      + Math.sin(i * 0.30 + t * speed * 1.2 + 2.5) * amp * 0.22;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = color; ctx.lineWidth = 0.9; ctx.stroke();
+}
+
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0,    '#1c2436');
+  bg.addColorStop(0.38, '#141c2c');
+  bg.addColorStop(0.70, '#0e1622');
+  bg.addColorStop(1,    '#070b12');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  const ml = ctx.createRadialGradient(W*0.5, H*0.12, 0, W*0.5, H*0.35, W*0.55);
+  ml.addColorStop(0,   'rgba(200,218,255,0.10)');
+  ml.addColorStop(0.6, 'rgba(180,205,255,0.04)');
+  ml.addColorStop(1,   'transparent');
+  ctx.fillStyle = ml; ctx.fillRect(0, 0, W, H);
+
+  const seaY = H * 0.60;
+  drawWave(t, seaY,     3.0, 0.00038, 'rgba(190,215,255,0.20)');
+  drawWave(t, seaY+4,   2.2, 0.00052, 'rgba(190,215,255,0.11)');
+  drawWave(t, seaY-2.5, 1.8, 0.00028, 'rgba(210,228,255,0.09)');
+
+  ctx.beginPath();
+  for (let i = 0; i <= WAVE_POINTS; i++) {
+    const x = (i / WAVE_POINTS) * W;
+    const y = seaY + Math.sin(i*0.16+t*0.00038)*3.0 + Math.sin(i*0.08+t*0.00025+1.3)*1.35;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+  const sf = ctx.createLinearGradient(0,seaY,0,H);
+  sf.addColorStop(0, 'rgba(6,12,22,0.50)'); sf.addColorStop(1, 'rgba(3,6,12,0.80)');
+  ctx.fillStyle = sf; ctx.fill();
+
+  for (const p of snow) {
+    p.y -= p.speed; p.wobble += p.wobbleSpeed;
+    if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
+    const px = (p.x + Math.sin(p.wobble)*0.014)*W;
+    const py = p.y*H;
+    const a = p.alpha * (0.25 + p.y*0.75);
+    ctx.beginPath(); ctx.arc(px,py,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(200,220,255,${a})`; ctx.fill();
+  }
   requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
 </script>
 
+<!-- Firebase + ロジック -->
 <script type="module">
-import { initializeApp } from "www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getFirestore,collection,addDoc,getDocs,deleteDoc,doc,orderBy,query } from "www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query }
+  from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-const firebaseConfig={apiKey:"AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",authDomain:"azul-1a3c9.firebaseapp.com",projectId:"azul-1a3c9",storageBucket:"azul-1a3c9.firebasestorage.app",messagingSenderId:"107176111624",appId:"1:107176111624:web:78bc25fbe09bcd3b47ebbd"};
-const app=initializeApp(firebaseConfig),db=getFirestore(app);
+const firebaseConfig = {
+  apiKey: "AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",
+  authDomain: "azul-1a3c9.firebaseapp.com",
+  projectId: "azul-1a3c9",
+  storageBucket: "azul-1a3c9.firebasestorage.app",
+  messagingSenderId: "107176111624",
+  appId: "1:107176111624:web:78bc25fbe09bcd3b47ebbd",
+  measurementId: "G-N409CFN5J6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // ---- パスワード設定 ----
 const READ_PASSWORD  = 'remember';   // 読む用
@@ -428,23 +788,30 @@ async function postEntry() {
   } catch(e) { alert('投稿に失敗しました。'); }
 }
 
-// 右上鍵アイコン（オーナー昇格）
-document.getElementById('lock-icon-btn').addEventListener('click',()=>{
-  if(isOwner)return;
-  const pw=prompt('write password');
-  if(pw===WRITE_PW){isOwner=true;document.getElementById('new-moon-btn').classList.add('show');}
+// カテゴリフィルター
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    renderCards();
+  });
 });
 
-document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkPassword();});
-document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));
-document.getElementById('story-modal-delete').addEventListener('click',deleteStory);
-document.getElementById('new-moon-btn').addEventListener('click',()=>{if(isOwner)document.getElementById('post-modal').classList.add('open');});
-document.getElementById('post-close').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));
-document.getElementById('btn-cancel').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));
-document.getElementById('btn-post').addEventListener('click',postStory);
-document.getElementById('back-top-btn').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-document.getElementById('story-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
-document.getElementById('post-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+// イベントリスナー
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key==='Enter') checkPassword(); });
+document.getElementById('modal-close').addEventListener('click', () => document.getElementById('detail-modal').classList.remove('open'));
+document.getElementById('modal-delete').addEventListener('click', deleteCurrentEntry);
+document.getElementById('new-moon-btn').addEventListener('click', () => document.getElementById('post-modal').classList.add('open'));
+document.getElementById('post-close').addEventListener('click', () => document.getElementById('post-modal').classList.remove('open'));
+document.getElementById('btn-cancel').addEventListener('click', () => document.getElementById('post-modal').classList.remove('open'));
+document.getElementById('btn-post').addEventListener('click', postEntry);
+document.getElementById('back-top-btn').addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
+
+// モーダル外クリックで閉じる
+document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
+document.getElementById('post-modal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 </script>
+
 </body>
 </html>
