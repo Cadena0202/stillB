@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story — Remember the promise.</title>
+<link href="fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --mustard:#c8a93a; --text:rgba(220,230,245,0.78); --text-dim:rgba(170,190,215,0.48); }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;min-height:100vh;background:#0c1019;color:var(--text);font-family:'Shippori Mincho',serif;overflow-x:hidden;}
+  #bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  .corner{position:fixed;width:16px;height:16px;border-style:solid;z-index:50;pointer-events:none;opacity:0.28;}
+  .corner-tl{top:14px;left:14px;border-color:rgba(200,220,255,0.55);border-width:1px 0 0 1px;}
+  .corner-tr{top:14px;right:14px;border-color:rgba(200,220,255,0.55);border-width:1px 1px 0 0;}
+  .corner-bl{bottom:14px;left:14px;border-color:rgba(200,220,255,0.55);border-width:0 0 1px 1px;}
+  .corner-br{bottom:14px;right:14px;border-color:rgba(200,220,255,0.55);border-width:0 1px 1px 0;}
+
+  /* パスワードオーバーレイ */
+  #lock-overlay{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(6,10,18,0.96);backdrop-filter:blur(12px);transition:opacity 1s ease;}
+  #lock-overlay.hiding{opacity:0;pointer-events:none;}
+  .lock-box{display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0;animation:fadein 1.2s ease 0.3s forwards;}
+  .lock-icon{font-size:22px;opacity:0.30;}
+  .lock-title{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;color:rgba(210,225,255,0.38);letter-spacing:0.22em;}
+  .lock-input{background:transparent;border:none;border-bottom:1px solid rgba(200,220,255,0.22);color:rgba(220,232,255,0.72);font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:0.35em;padding:6px 4px;width:200px;text-align:center;outline:none;transition:border-color 0.4s;text-shadow:0 0 10px rgba(160,200,255,0.28);}
+  .lock-input:focus{border-color:rgba(200,220,255,0.42);}
+  .lock-input::placeholder{color:rgba(200,220,255,0.14);font-style:italic;font-size:13px;}
+  .lock-error{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(220,140,140,0.55);letter-spacing:0.15em;min-height:16px;}
+  .lock-hint{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:10px;color:rgba(200,220,255,0.16);letter-spacing:0.22em;}
+
+  /* メイン */
+  #main-content{display:none;position:relative;z-index:10;min-height:100vh;flex-direction:column;}
+  #main-content.visible{display:flex;}
+
+  header{padding:22px 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,220,255,0.07);position:relative;z-index:20;}
+  .site-title{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;color:rgba(210,225,255,0.40);letter-spacing:0.18em;text-decoration:none;}
+  nav{display:flex;gap:28px;align-items:center;}
+  nav a{font-family:'Cormorant Garamond',serif;font-size:11px;color:rgba(160,185,220,0.38);text-decoration:none;letter-spacing:0.22em;text-transform:uppercase;transition:color 0.3s;position:relative;}
+  nav a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--mustard);transition:width 0.3s;opacity:0.5;}
+  nav a:hover{color:rgba(200,215,255,0.70);}
+  nav a:hover::after{width:100%;}
+  nav a.active{color:rgba(200,169,58,0.60);}
+
+  /* 鍵アイコン（右上） */
+  #lock-icon-btn{font-size:16px;opacity:0.30;cursor:pointer;transition:opacity 0.3s;background:none;border:none;color:inherit;}
+  #lock-icon-btn:hover{opacity:0.65;}
+
+  /* ストーリーリスト */
+  .story-wrap{max-width:720px;margin:0 auto;padding:36px 28px 100px;width:100%;position:relative;z-index:10;}
+  .story-header{margin-bottom:40px;display:flex;align-items:baseline;gap:18px;}
+  .story-header h1{font-family:'IM Fell English',serif;font-style:italic;font-size:24px;color:rgba(210,225,255,0.62);letter-spacing:0.08em;}
+  .story-header-line{flex:1;height:1px;background:linear-gradient(to right,rgba(200,220,255,0.14),transparent);}
+
+  .story-list{display:flex;flex-direction:column;gap:0;}
+  .story-item{border-bottom:1px solid rgba(200,220,255,0.07);padding:22px 6px;display:flex;align-items:baseline;gap:20px;cursor:pointer;transition:background 0.25s;opacity:0;transform:translateY(6px);animation:cardrise 0.55s ease forwards;position:relative;}
+  .story-item:hover{background:rgba(200,220,255,0.03);}
+  @keyframes cardrise{to{opacity:1;transform:translateY(0);}}
+  .story-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(200,169,58,0.35);letter-spacing:0.15em;min-width:28px;}
+  .story-info{flex:1;}
+  .story-title{font-family:'IM Fell English',serif;font-size:16px;color:rgba(210,225,255,0.65);letter-spacing:0.06em;margin-bottom:6px;}
+  .story-desc{font-size:12px;color:rgba(180,205,235,0.40);line-height:1.8;letter-spacing:0.03em;}
+  .story-arrow{font-size:12px;color:rgba(200,220,255,0.20);transition:color 0.3s,transform 0.3s;}
+  .story-item:hover .story-arrow{color:rgba(200,220,255,0.50);transform:translateX(4px);}
+
+  /* 詳細モーダル */
+  #story-modal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,10,18,0.93);backdrop-filter:blur(10px);align-items:flex-start;justify-content:center;padding:48px 24px;overflow-y:auto;}
+  #story-modal.open{display:flex;}
+  .story-modal-inner{max-width:640px;width:100%;border-left:1px solid rgba(200,220,255,0.12);padding:36px 42px;position:relative;}
+  .story-modal-title{font-family:'IM Fell English',serif;font-size:22px;color:rgba(210,225,255,0.70);letter-spacing:0.08em;margin-bottom:8px;}
+  .story-modal-meta{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(200,169,58,0.38);letter-spacing:0.18em;margin-bottom:28px;}
+  .story-modal-body{font-size:14px;line-height:2.4;color:rgba(190,210,240,0.60);letter-spacing:0.05em;white-space:pre-wrap;}
+  .story-modal-close{position:absolute;top:14px;right:14px;background:transparent;border:none;color:rgba(200,220,255,0.20);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.20em;cursor:pointer;transition:color 0.3s;}
+  .story-modal-close:hover{color:rgba(200,220,255,0.50);}
+  .story-modal-delete{margin-top:28px;background:transparent;border:none;color:rgba(220,120,120,0.16);font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:0.20em;cursor:pointer;transition:color 0.3s;display:none;}
+  .story-modal-delete.show{display:inline;}
+  .story-modal-delete:hover{color:rgba(220,120,120,0.45);}
+
+  /* 投稿モーダル */
+  #post-modal{display:none;position:fixed;inset:0;z-index:60;background:rgba(6,10,18,0.93);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:40px 24px;}
+  #post-modal.open{display:flex;}
+  .post-inner{max-width:560px;width:100%;border-left:1px solid rgba(200,169,58,0.15);padding:34px 38px;position:relative;display:flex;flex-direction:column;gap:13px;}
+  .post-label{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;color:rgba(200,169,58,0.36);letter-spacing:0.20em;}
+  .form-input,.form-textarea{background:rgba(4,8,18,0.55);border:none;border-bottom:1px solid rgba(200,220,255,0.14);color:rgba(210,225,255,0.75);font-family:'Shippori Mincho',serif;font-size:14px;padding:8px 4px;outline:none;resize:none;line-height:1.9;letter-spacing:0.04em;transition:border-color 0.3s;width:100%;}
+  .form-textarea{min-height:200px;}
+  .form-input:focus,.form-textarea:focus{border-color:rgba(200,220,255,0.28);}
+  .form-input::placeholder,.form-textarea::placeholder{color:rgba(160,185,220,0.17);font-style:italic;}
+  .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;}
+  .btn-post{background:transparent;border:1px solid rgba(200,169,58,0.25);color:rgba(200,169,58,0.60);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;padding:7px 20px;cursor:pointer;transition:all 0.3s;}
+  .btn-post:hover{border-color:rgba(200,169,58,0.46);color:rgba(200,169,58,0.82);}
+  .btn-cancel{background:transparent;border:1px solid rgba(200,220,255,0.09);color:rgba(160,185,220,0.28);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;padding:7px 20px;cursor:pointer;transition:all 0.3s;}
+  .btn-cancel:hover{border-color:rgba(200,220,255,0.18);color:rgba(160,185,220,0.55);}
+  .post-close{position:absolute;top:14px;right:14px;background:transparent;border:none;color:rgba(200,220,255,0.18);font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:0.20em;cursor:pointer;transition:color 0.3s;}
+  .post-close:hover{color:rgba(200,220,255,0.45);}
+
+  /* 新月ボタン */
+  #new-moon-btn{display:none;position:fixed;bottom:30px;right:32px;z-index:30;width:34px;height:34px;border-radius:50%;cursor:pointer;background:radial-gradient(circle at 30% 35%,rgba(30,34,44,0.95),rgba(10,12,18,0.98));border:1px solid rgba(200,220,255,0.10);box-shadow:0 2px 12px rgba(0,0,0,0.50);transition:box-shadow 0.3s,transform 0.3s;-webkit-mask:radial-gradient(circle at 68% 38%,transparent 32%,black 34%);mask:radial-gradient(circle at 68% 38%,transparent 32%,black 34%);}
+  #new-moon-btn:hover{transform:scale(1.08);}
+  #new-moon-btn.show{display:block;}
+
+  #back-top{display:flex;justify-content:center;padding:14px 0 54px;}
+  #back-top-btn{width:13px;height:13px;border-radius:50%;background:rgba(200,220,255,0.22);border:none;cursor:pointer;transition:background 0.3s,transform 0.3s;display:block;}
+  #back-top-btn:hover{background:rgba(200,220,255,0.45);transform:scale(1.2);}
+
+  .side-bar{position:fixed;right:9px;top:50%;transform:translateY(-50%);width:1px;height:33vh;background:linear-gradient(to bottom,transparent,rgba(200,220,255,0.13) 30%,rgba(200,220,255,0.13) 70%,transparent);z-index:5;pointer-events:none;}
+
+  .empty-note,.loading-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:rgba(160,185,220,0.20);letter-spacing:0.15em;text-align:center;padding:60px 0;}
+
+  footer{padding:18px 36px;border-top:1px solid rgba(200,220,255,0.05);display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:10;}
+  .footer-line{flex:1;max-width:80px;height:1px;}
+  .footer-line.blue{background:linear-gradient(to right,transparent,rgba(200,220,255,0.12));}
+  .footer-line.gold{background:linear-gradient(to left,transparent,rgba(200,169,58,0.12));}
+  .footer-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:10px;color:rgba(160,185,220,0.17);letter-spacing:0.20em;}
+
+  @keyframes fadein{to{opacity:1;}}
+  @media(max-width:580px){header{padding:16px 18px;}.story-wrap{padding:26px 16px 100px;}}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- パスワードオーバーレイ -->
+<div id="lock-overlay">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">enter the password</div>
+    <input class="lock-input" type="password" id="pw-input" placeholder="· · · · · ·" autocomplete="off" />
+    <div class="lock-error" id="pw-error"></div>
+    <div class="lock-hint">— press enter —</div>
+  </div>
+</div>
+
+<!-- メイン -->
+<div id="main-content">
+  <header>
+    <a href="index.html" class="site-title">Remember the promise.</a>
+    <nav>
+      <a href="diary.html">Log</a>
+      <a href="story.html" class="active">Story</a>
+      <button id="lock-icon-btn" title="write password">🔒</button>
+    </nav>
+  </header>
+
+  <div class="side-bar"></div>
+
+  <div class="story-wrap">
+    <div class="story-header">
+      <h1>Story</h1>
+      <div class="story-header-line"></div>
+    </div>
+    <div class="story-list" id="story-list">
+      <div class="loading-note">— loading —</div>
+    </div>
+    <div id="back-top"><button id="back-top-btn"></button></div>
+  </div>
+
+  <footer>
+    <div class="footer-line blue"></div>
+    <span class="footer-text">Remember the promise.</span>
+    <div class="footer-line gold"></div>
+  </footer>
+</div>
+
+<!-- 詳細モーダル -->
+<div id="story-modal">
+  <div class="story-modal-inner">
+    <button class="story-modal-close" id="story-modal-close">close</button>
+    <div class="story-modal-title" id="story-modal-title"></div>
+    <div class="story-modal-meta" id="story-modal-meta"></div>
+    <div class="story-modal-body" id="story-modal-body"></div>
+    <button class="story-modal-delete" id="story-modal-delete">delete</button>
+  </div>
+</div>
+
+<!-- 投稿モーダル -->
+<div id="post-modal">
+  <div class="post-inner">
+    <button class="post-close" id="post-close">close</button>
+    <div class="post-label">new story</div>
+    <input class="form-input" type="text" id="story-title-input" placeholder="title" />
+    <input class="form-input" type="text" id="story-desc-input" placeholder="short description (optional)" />
+    <textarea class="form-textarea" id="story-body-input" placeholder="お話を書いてください。"></textarea>
+    <div class="form-actions">
+      <button class="btn-cancel" id="btn-cancel">Cancel</button>
+      <button class="btn-post" id="btn-post">Post</button>
+    </div>
+  </div>
+</div>
+
+<div id="new-moon-btn" title="New story"></div>
+
+<script>
+const canvas=document.getElementById('bg'),ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+const SNOW=Array.from({length:40},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.4+0.3,speed:Math.random()*0.00008+0.00003,alpha:Math.random()*0.24+0.05,wobble:Math.random()*Math.PI*2,ws:Math.random()*0.0007+0.0002}));
+function draw(t){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#1a2130');bg.addColorStop(0.5,'#111822');bg.addColorStop(1,'#070b12');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  for(const p of SNOW){p.y-=p.speed;p.wobble+=p.ws;if(p.y<-0.02){p.y=1.02;p.x=Math.random();}
+    const px=(p.x+Math.sin(p.wobble)*0.013)*W,py=p.y*H;
+    ctx.beginPath();ctx.arc(px,py,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,220,255,${p.alpha*(0.25+p.y*0.75)})`;ctx.fill();}
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+
+<script type="module">
+import { initializeApp } from "www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore,collection,addDoc,getDocs,deleteDoc,doc,orderBy,query } from "www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",authDomain:"azul-1a3c9.firebaseapp.com",projectId:"azul-1a3c9",storageBucket:"azul-1a3c9.firebasestorage.app",messagingSenderId:"107176111624",appId:"1:107176111624:web:78bc25fbe09bcd3b47ebbd"};
+const app=initializeApp(firebaseConfig),db=getFirestore(app);
+
+// ---- パスワード設定 ----
+const READ_PW  = 'story';      // 読む用（変えてください）
+const WRITE_PW = 'azul2024';   // 書く用（変えてください）
+
+let isOwner=false, allStories=[], currentStoryId=null;
+
+function escHtml(s){return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');}
+
+function unlock(owner){
+  isOwner=owner;
+  const lo=document.getElementById('lock-overlay');
+  lo.classList.add('hiding');
+  setTimeout(()=>{
+    lo.style.display='none';
+    document.getElementById('main-content').classList.add('visible');
+    if(isOwner)document.getElementById('new-moon-btn').classList.add('show');
+    loadStories();
+  },1100);
+}
+
+function checkPassword(){
+  const val=document.getElementById('pw-input').value;
+  const err=document.getElementById('pw-error');
+  if(val===WRITE_PW){unlock(true);}
+  else if(val===READ_PW){unlock(false);}
+  else{
+    err.textContent='the key does not fit.';
+    document.getElementById('pw-input').value='';
+    setTimeout(()=>{err.textContent='';},2500);
+  }
+}
+
+async function loadStories(){
+  const list=document.getElementById('story-list');
+  list.innerHTML='<div class="loading-note">— loading —</div>';
+  try{
+    const q=query(collection(db,'stories'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    allStories=[];
+    snap.forEach(d=>allStories.push({id:d.id,...d.data()}));
+    renderStories();
+  }catch(e){list.innerHTML='<div class="empty-note">— まだ何も書かれていない —</div>';}
+}
+
+function renderStories(){
+  const list=document.getElementById('story-list');
+  list.innerHTML='';
+  if(allStories.length===0){list.innerHTML='<div class="empty-note">— まだ何も書かれていない —</div>';return;}
+  allStories.forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className='story-item';
+    el.style.animationDelay=`${i*0.06}s`;
+    el.innerHTML=`<span class="story-num">${String(allStories.length-i).padStart(2,'0')}.</span><div class="story-info"><div class="story-title">${escHtml(s.title||'— 無題 —')}</div><div class="story-desc">${escHtml(s.desc||'')}</div></div><span class="story-arrow">→</span>`;
+    el.addEventListener('click',()=>openStory(s));
+    list.appendChild(el);
+  });
+}
+
+function openStory(s){
+  currentStoryId=s.id;
+  document.getElementById('story-modal-title').textContent=s.title||'— 無題 —';
+  document.getElementById('story-modal-meta').textContent=s.date||'';
+  document.getElementById('story-modal-body').textContent=s.body||'';
+  const del=document.getElementById('story-modal-delete');
+  isOwner?del.classList.add('show'):del.classList.remove('show');
+  document.getElementById('story-modal').classList.add('open');
+}
+
+async function deleteStory(){
+  if(!isOwner||!currentStoryId)return;
+  try{
+    await deleteDoc(doc(db,'stories',currentStoryId));
+    document.getElementById('story-modal').classList.remove('open');
+    allStories=allStories.filter(s=>s.id!==currentStoryId);
+    currentStoryId=null;renderStories();
+  }catch(e){alert('削除に失敗しました。');}
+}
+
+async function postStory(){
+  if(!isOwner)return;
+  const title=document.getElementById('story-title-input').value.trim();
+  const desc=document.getElementById('story-desc-input').value.trim();
+  const body=document.getElementById('story-body-input').value.trim();
+  if(!body)return;
+  const now=new Date();
+  const date=now.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  try{
+    const ref=await addDoc(collection(db,'stories'),{title:title||'— 無題 —',desc,body,date,createdAt:now.getTime()});
+    allStories.unshift({id:ref.id,title:title||'— 無題 —',desc,body,date,createdAt:now.getTime()});
+    document.getElementById('story-title-input').value='';
+    document.getElementById('story-desc-input').value='';
+    document.getElementById('story-body-input').value='';
+    document.getElementById('post-modal').classList.remove('open');
+    renderStories();
+  }catch(e){alert('投稿に失敗しました。');}
+}
+
+// 右上鍵アイコン（オーナー昇格）
+document.getElementById('lock-icon-btn').addEventListener('click',()=>{
+  if(isOwner)return;
+  const pw=prompt('write password');
+  if(pw===WRITE_PW){isOwner=true;document.getElementById('new-moon-btn').classList.add('show');}
+});
+
+document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkPassword();});
+document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));
+document.getElementById('story-modal-delete').addEventListener('click',deleteStory);
+document.getElementById('new-moon-btn').addEventListener('click',()=>{if(isOwner)document.getElementById('post-modal').classList.add('open');});
+document.getElementById('post-close').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));
+document.getElementById('btn-cancel').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));
+document.getElementById('btn-post').addEventListener('click',postStory);
+document.getElementById('back-top-btn').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+document.getElementById('story-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+document.getElementById('post-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+</script>
+</body>
+</html>
