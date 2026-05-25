@@ -223,20 +223,19 @@ const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const READ_PW  = 'story';      // 読む用（変えてください）
 const WRITE_PW = 'azul2024';   // 書く用（変えてください）
 
-let isOwner=false, allStories=[], currentStoryId=null;
+let isOwner = false;
+let allEntries = [];
+let currentCat = 'all';
+let currentEntryId = null;
 
-function escHtml(s){return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-function unlock(owner){
-  isOwner=owner;
-  const lo=document.getElementById('lock-overlay');
-  lo.classList.add('hiding');
-  setTimeout(()=>{
-    lo.style.display='none';
-    document.getElementById('main-content').classList.add('visible');
-    if(isOwner)document.getElementById('new-moon-btn').classList.add('show');
-    loadStories();
-  },1100);
+function unlock() {
+  const ls = document.getElementById('lock-screen');
+  const overlay = document.getElementById('loading-overlay');
+  const bc = document.getElementById('bubble-canvas');
 }
 
 function checkPassword(){
