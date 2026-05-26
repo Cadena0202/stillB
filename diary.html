@@ -534,13 +534,6 @@ function initializePage() {
   loadEntries();
 }
 
-else if (val === READ_PASSWORD) { isOwner = false; unlock(); }
-  else {
-    err.textContent = 'the key does not fit.';
-    setTimeout(() => { err.textContent = ''; }, 2500);
-  }
-}
-
 async function loadEntries() {
   const grid = document.getElementById('card-grid');
   grid.innerHTML = '<div class="loading-note">— loading —</div>';
