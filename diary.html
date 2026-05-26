@@ -550,13 +550,7 @@ import {
   doc,
   orderBy,
   query
-} from "www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged
-} from "www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+} from "http://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",
@@ -570,7 +564,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
 const mode = sessionStorage.getItem('mode');
 
@@ -582,25 +575,18 @@ if (isReload) {
   window.location.href = 'index.html';
 }
 
-let isOwner = false;
-
-onAuthStateChanged(auth, (user) => {
-
-  if (!user) {
-    window.location.href = 'index.html';
-    return;
-  }
-
-  isOwner = true;
-
-  document.getElementById('main-content').classList.add('visible');
-  document.getElementById('new-moon-btn').classList.add('show');
-
-});
-
-});
-
 let isOwner = mode === 'owner';
+
+if (!mode) {
+  window.location.href = 'index.html';
+}
+
+document.getElementById('main-content').classList.add('visible');
+
+if (isOwner) {
+  document.getElementById('new-moon-btn').classList.add('show');
+}
+
 let allEntries = [];
 let currentCat = 'all';
 let currentEntryId = null;
