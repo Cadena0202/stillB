@@ -311,6 +311,26 @@
     background: rgba(4,6,12,0.96);
     pointer-events: auto;
   }
+  /* 白フェードイン */
+#page-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background:
+    radial-gradient(circle at 50% 38%,
+      rgba(255,255,255,0.96) 0%,
+      rgba(220,235,255,0.88) 22%,
+      rgba(170,205,255,0.35) 48%,
+      rgba(255,255,255,0) 78%);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 2.4s ease;
+}
+
+#page-fade.hide {
+  opacity: 0;
+}
+  
   #bubble-canvas {
     position: fixed; inset: 0; z-index: 56; pointer-events: none;
     opacity: 0; transition: opacity 0.4s ease;
@@ -327,6 +347,7 @@
 </head>
 <body>
 
+<div id="page-fade"></div>
 <canvas id="bg"></canvas>
 <div class="corner corner-tl"></div>
 <div class="corner corner-tr"></div>
@@ -711,6 +732,13 @@ document.getElementById('back-top-btn').addEventListener('click', () => window.s
 // モーダル外クリックで閉じる
 document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 document.getElementById('post-modal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
+  
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('page-fade').classList.add('hide');
+  }, 200);
+});
+  
 </script>
 
 </body>
