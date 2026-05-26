@@ -163,9 +163,9 @@ function startBubbles(bc) {
   const bctx=bc.getContext('2d');
   bc.width=window.innerWidth; bc.height=window.innerHeight;
   const BW=bc.width, BH=bc.height;
-  const bubbles=Array.from({length:38},(_,i)=>({
+  const bubbles=Array.from({length:65},(_,i)=>({
     x:Math.random()*BW, y:BH+Math.random()*80+20,
-    r:Math.random()*10+4, speed:Math.random()*2.2+1.0,
+    r:Math.random()*10+4, speed:Math.random()*3.8+2.2,
     alpha:Math.random()*0.35+0.12,
     wobble:Math.random()*Math.PI*2, wobbleAmp:Math.random()*1.8+0.5,
     delay:i*55,born:false,startTime:null,
@@ -181,7 +181,7 @@ function startBubbles(bc) {
       if(!b.born){b.born=true;b.startTime=ts;}
       b.y-=b.speed; b.wobble+=0.03;
       const bx=b.x+Math.sin(b.wobble)*b.wobbleAmp;
-      if(b.y+b.r<0){b.y=BH+b.r;b.x=Math.random()*BW;}
+      if(b.y+b.r<0) continue;
       const g=bctx.createRadialGradient(bx-b.r*0.3,b.y-b.r*0.3,b.r*0.1,bx,b.y,b.r);
       g.addColorStop(0,`rgba(220,235,255,${b.alpha*0.6})`);
       g.addColorStop(0.5,`rgba(180,210,255,${b.alpha*0.25})`);
@@ -193,8 +193,9 @@ function startBubbles(bc) {
       bctx.beginPath(); bctx.arc(bx-b.r*0.28,b.y-b.r*0.28,b.r*0.22,0,Math.PI*2);
       bctx.fillStyle=`rgba(255,255,255,${b.alpha*0.45})`; bctx.fill();
     }
-    if(el<2600)requestAnimationFrame(anim);
-    else{bctx.clearRect(0,0,BW,BH);running=false;}
+    if(el<3400)requestAnimationFrame(anim);
+    else{
+     running=false;}
   }
   requestAnimationFrame(anim);
 }
