@@ -273,11 +273,14 @@ const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const READ_PW  = 'ubatte';      // 読む用（変えてください）  
 const WRITE_PW = '2243';   // 書く用（変えてください）  
   
-let isOwner=false, allStories=[], currentStoryId=null, editingStoryId=null;  
+let isOwner=false, allStories=[], currentStoryId=null, editingStoryId=null; 
+let unlocked = false;
   
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}  
   
-function unlock(owner){  
+function unlock(owner){ 
+  if(unloked) return;
+  unloked = true;
   isOwner=owner;  
   const lo=document.getElementById('lock-overlay');  
   lo.classList.add('hiding');  
