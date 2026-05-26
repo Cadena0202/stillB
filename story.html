@@ -456,6 +456,11 @@ pwInput.addEventListener('keydown',e=>{
     checkPassword();
   }
 });
+  // iPhone対策
+pwInput.addEventListener('keyup',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    checkPassword();
 
 document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));  
 document.getElementById('story-modal-delete').addEventListener('click',deleteStory);  
