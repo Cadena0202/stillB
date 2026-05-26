@@ -294,8 +294,7 @@ function renderStories(){
   
 function openStory(s){  
   currentStoryId=s.id;  
-  document.getElementById('story-modal-title').textContent=s.title||'— 無題 —';  
-  document.getElementById('story-modal-meta').textContent=s.date||'';  
+  document.getElementById('story-modal-title').textContent=s.title||'— 無題 —';   
   document.getElementById('story-modal-body').textContent=s.body||'';  
   const del=document.getElementById('story-modal-delete');
   const edit=document.getElementById('story-modal-edit');
