@@ -565,7 +565,7 @@ let isOwner = mode === 'owner';
 let allEntries = [];
 let currentCat = 'all';
 let currentEntryId = null;
-let editingDiaryId = null;
+let currentEditingId = null;
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
