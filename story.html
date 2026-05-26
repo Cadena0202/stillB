@@ -189,6 +189,63 @@
     transform:translateY(0);
     filter:blur(0);
   }
+}  
+.loading-flash{
+  position:absolute;
+  left:50%;
+  top:50%;
+
+  width:8px;
+  height:8px;
+
+  border-radius:50%;
+
+  background:rgba(255,70,70,0.95);
+
+  transform:translate(-50%,-50%) scale(0);
+
+  pointer-events:none;
+  opacity:0;
+
+  box-shadow:
+    0 0 12px rgba(255,70,70,0.9),
+    0 0 32px rgba(255,40,40,0.55),
+    0 0 80px rgba(255,0,0,0.25);
+
+  z-index:20;
+}
+
+.loading-flash.active{
+  animation:redPulse 1.1s ease forwards;
+}
+
+@keyframes redPulse{
+
+  0%{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0.2);
+    filter:blur(8px);
+  }
+
+  18%{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(10);
+    filter:blur(1px);
+  }
+
+  45%{
+    opacity:0.75;
+    transform:translate(-50%,-50%) scale(24);
+    filter:blur(10px);
+  }
+
+  100%{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(42);
+    filter:blur(22px);
+  }
+
+}
 
 }
   
