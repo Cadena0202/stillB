@@ -197,7 +197,7 @@
   }
 }  
 .loading-flash{
-  position:absolute;
+  position:fixed;
   left:50%;
   top:50%;
 
@@ -206,7 +206,7 @@
 
   border-radius:50%;
 
-  background:rgba(255,0,0,0.1);
+  background:rgba(255,0,0,1);
 
   transform:translate(-50%,-50%) scale(0);
 
@@ -218,7 +218,7 @@
     0 0 60px rgba(255,0,0,0.8),
     0 0 140px rgba(255,0,0,0.45);
 
-  z-index:20;
+  z-index:9999;
 }
 
 .loading-flash.active{
@@ -337,8 +337,8 @@
     </div>  
     <div class="story-list" id="story-list">  
       <div class="loading-note">— loading —</div>  
-      <div class="loading-flash" id="loading-flash"></div>
     </div>  
+     <div class="loading-flash" id="loading-flash"></div>
     <div id="back-top"><button id="back-top-btn"></button></div>  
   </div>  
   
