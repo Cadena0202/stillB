@@ -1,3 +1,4 @@
+！！！
 <!DOCTYPE html>  
 <html lang="ja">  
 <head>  
@@ -273,14 +274,11 @@ const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const READ_PW  = 'ubatte';      // 読む用（変えてください）  
 const WRITE_PW = '2243';   // 書く用（変えてください）  
   
-let isOwner=false, allStories=[], currentStoryId=null, editingStoryId=null; 
-let unlocked = false;
+let isOwner=false, allStories=[], currentStoryId=null, editingStoryId=null;  
   
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}  
   
-function unlock(owner){ 
-  if(unloked) return;
-  unloked = true;
+function unlock(owner){  
   isOwner=owner;  
   const lo=document.getElementById('lock-overlay');  
   lo.classList.add('hiding');  
@@ -456,12 +454,21 @@ pwInput.addEventListener('keydown',e=>{
     checkPassword();
   }
 });
-  // iPhone対策
+
+// iPhone対策
 pwInput.addEventListener('keyup',e=>{
   if(e.key==='Enter'){
     e.preventDefault();
     checkPassword();
+  }
+});
 
+// ボタン無しでも入力完了で反応しやすくする
+pwInput.addEventListener('change',()=>{
+  if(pwInput.value.trim().length>0){
+    checkPassword();
+  }
+});  
 document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));  
 document.getElementById('story-modal-delete').addEventListener('click',deleteStory);  
 document.getElementById('story-modal-edit').addEventListener('click',editStory); 
