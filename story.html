@@ -310,6 +310,18 @@ async function deleteStory(){
   }catch(e){alert('削除に失敗しました。');}  
 }  
   
+  function editStory(){
+  if(!isOwner || !currentStoryId) return;
+  const s = allStories.find(x => x.id === currentStoryId);
+  if(!s) return;
+  editingStoryId = s.id;
+  document.getElementById('story-title-input').value = s.title || '';
+  document.getElementById('story-desc-input').value = s.desc || '';
+  document.getElementById('story-body-input').value = s.body || '';
+  document.getElementById('story-modal').classList.remove('open');
+  document.getElementById('post-modal').classList.add('open');
+}
+  
 async function postStory(){  
   if(!isOwner)return;  
   const title=document.getElementById('story-title-input').value.trim();  
