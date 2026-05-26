@@ -191,13 +191,21 @@
     margin-right:12px;
     background:transparent;
     border:none;
-    color:rgba(170,190,235,0.22);
+    color:rgba(220,230,255,0.24);
     font-family:'Cormorant Garamond',serif;
     font-size:10px;
     letter-spacing:0.20em;
     cursor:pointer;
     transition:color 0.3s;
     display:none;
+}
+
+.modal-edit.show{
+    display:inline;
+}
+
+.modal-edit:hover{
+    color:rgba(235,242,255,0.72);
 }
 
   /* 投稿フォームモーダル */
@@ -429,8 +437,8 @@
     <div class="modal-date" id="modal-date"></div>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-body" id="modal-body"></div>
-    <button class="modal-delete" id="modal-delete">delete</button>
     <button class="modal-edit" id="modal-edit">edit</button>
+    <button class="modal-delete" id="modal-delete">delete</button>
   </div>
 </div>
 
@@ -831,6 +839,10 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('page-fade').classList.add('hide');
   }, 200);
+});
+  // リロード・タブ閉じで再認証
+window.addEventListener('beforeunload', () => {
+  sessionStorage.removeItem('mode');
 });
   
 </script>
