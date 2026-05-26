@@ -186,6 +186,19 @@
   }
   .modal-delete.show { display: inline; }
   .modal-delete:hover { color: rgba(220,120,120,0.50); }
+  .story-modal-edit{
+    margin-top:28px;
+    margin-right:12px;
+    background:transparent;
+    border:none;
+    color:rgba(170,190,235,0.22);
+    font-family:'Cormorant Garamond',serif;
+    font-size:10px;
+    letter-spacing:0.20em;
+    cursor:pointer;
+    transition:color 0.3s;
+    display:none;
+}
 
   /* 投稿フォームモーダル */
   #post-modal {
@@ -417,6 +430,7 @@
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-body" id="modal-body"></div>
     <button class="modal-delete" id="modal-delete">delete</button>
+    <button class="modal-delete" id="modal-edit">edit</button>
   </div>
 </div>
 
@@ -524,7 +538,7 @@ requestAnimationFrame(draw);
 <!-- Firebase + ロジック -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query }
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, orderBy, query }
   from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -551,6 +565,7 @@ let isOwner = mode === 'owner';
 let allEntries = [];
 let currentCat = 'all';
 let currentEntryId = null;
+let currentEditingId = null;
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -686,9 +701,25 @@ function openDetail(entry) {
   document.getElementById('modal-date').textContent = entry.date || '';
   document.getElementById('modal-title').textContent = entry.title || '— 無題 —';
   document.getElementById('modal-body').textContent = entry.body || '';
-  const del = document.getElementById('modal-delete');
-  if (isOwner) del.classList.add('show'); else del.classList.remove('show');
-  document.getElementById('detail-modal').classList.add('open');
+  const del=document.getElementById('modal-delete');
+  const edit=document.getElementById('modal-edit');
+if(isOwner){
+  del.classList.add('show');
+  edit.classList.add('show');
+}else{
+  del.classList.remove('show');
+  edit.classList.remove('show');
+}
+  
+function openEdit(entry) {
+  currentEditingId = entry.id;
+
+  document.getElementById('entry-title-input').value = entry.title || '';
+  document.getElementById('entry-body-input').value = entry.body || '';
+  document.getElementById('entry-cat-input').value = entry.category || 'all';
+
+  document.getElementById('detail-modal').classList.remove('open');
+  document.getElementById('post-modal').classList.add('open');
 }
 
 async function deleteCurrentEntry() {
