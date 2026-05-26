@@ -226,7 +226,7 @@ requestAnimationFrame(draw);
   
 <script type="module">  
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";  
-import { getFirestore,collection,addDoc,getDocs,deleteDoc,doc,orderBy,query } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";  
+import { getFirestore,collection,addDoc,getDocs,deleteDoc,updateDoc,doc,orderBy,query } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";  
   
 const firebaseConfig={apiKey:"AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",authDomain:"azul-1a3c9.firebaseapp.com",projectId:"azul-1a3c9",storageBucket:"azul-1a3c9.firebasestorage.app",messagingSenderId:"107176111624",appId:"1:107176111624:web:78bc25fbe09bcd3b47ebbd"};  
 const app=initializeApp(firebaseConfig),db=getFirestore(app);  
