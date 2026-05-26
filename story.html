@@ -455,20 +455,6 @@ pwInput.addEventListener('keydown',e=>{
   }
 });
 
-// iPhone対策
-pwInput.addEventListener('keyup',e=>{
-  if(e.key==='Enter'){
-    e.preventDefault();
-    checkPassword();
-  }
-});
-
-// ボタン無しでも入力完了で反応しやすくする
-pwInput.addEventListener('change',()=>{
-  if(pwInput.value.trim().length>0){
-    checkPassword();
-  }
-});  
 document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));  
 document.getElementById('story-modal-delete').addEventListener('click',deleteStory);  
 document.getElementById('story-modal-edit').addEventListener('click',editStory); 
