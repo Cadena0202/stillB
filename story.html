@@ -360,6 +360,7 @@ if(isOwner){
 }
   
 document.getElementById('story-modal').classList.add('open');
+document.getElementById('deep-fade').classList.add('active');
 }
   
 async function deleteStory(){  
@@ -472,7 +473,8 @@ pwInput.addEventListener('keydown',e=>{
   }
 });
 
-document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));  
+document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));
+document.getElementById('deep-fede').classList.remove('active'));  
 document.getElementById('story-modal-delete').addEventListener('click',deleteStory);  
 document.getElementById('story-modal-edit').addEventListener('click',editStory); 
 document.getElementById('new-moon-btn').addEventListener('click',()=>{if(isOwner)document.getElementById('post-modal').classList.add('open');});  
@@ -481,7 +483,12 @@ document.getElementById('btn-cancel').addEventListener('click',()=>document.getE
 document.getElementById('btn-post').addEventListener('click',postStory);  
 document.getElementById('back-top-btn').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));  
 
-document.getElementById('story-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});  
+document.getElementById('story-modal').addEventListener('click',e=>{
+  if(e.target===e.currentTarget){
+    e.currentTarget.classList.remove('open');
+    document.getElementById('deep-fade').classList.remove('active');
+  }
+});
 document.getElementById('post-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});  
 </script> 
   
