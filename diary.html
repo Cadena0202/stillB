@@ -186,7 +186,7 @@
   }
   .modal-delete.show { display: inline; }
   .modal-delete:hover { color: rgba(220,120,120,0.50); }
-  .story-modal-edit{
+  .modal-edit{
     margin-top:28px;
     margin-right:12px;
     background:transparent;
@@ -430,7 +430,7 @@
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-body" id="modal-body"></div>
     <button class="modal-delete" id="modal-delete">delete</button>
-    <button class="modal-delete" id="modal-edit">edit</button>
+    <button class="modal-edit" id="modal-edit">edit</button>
   </div>
 </div>
 
@@ -565,7 +565,7 @@ let isOwner = mode === 'owner';
 let allEntries = [];
 let currentCat = 'all';
 let currentEntryId = null;
-let currentEditingId = null;
+let editingDiaryId = null;
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -766,6 +766,7 @@ document.querySelectorAll('.cat-btn').forEach(btn => {
 // イベントリスナー
 document.getElementById('modal-close').addEventListener('click', () => document.getElementById('detail-modal').classList.remove('open'));
 document.getElementById('modal-delete').addEventListener('click', deleteCurrentEntry);
+document.getElementById('modal-edit').addEventListener('click',modal-edit);
 document.getElementById('new-moon-btn').addEventListener('click', () => document.getElementById('post-modal').classList.add('open'));
 document.getElementById('post-close').addEventListener('click', () => document.getElementById('post-modal').classList.remove('open'));
 document.getElementById('btn-cancel').addEventListener('click', () => document.getElementById('post-modal').classList.remove('open'));
