@@ -326,21 +326,31 @@ function checkPassword() {
 }
 
 function startTransition() {
+
   const overlay = document.getElementById('loading-overlay');
   const bc = document.getElementById('bubble-canvas');
+  const flash = document.getElementById('white-flash');
 
   overlay.classList.add('active');
+
+  // 月を薄く
+  document.getElementById('moon').style.opacity = '0.15';
 
   setTimeout(() => {
     bc.classList.add('active');
     startBubbles(bc);
-  }, 600);
+  }, 300);
+
+  // 白い浮上光
+  setTimeout(() => {
+    flash.classList.add('active');
+  }, 1200);
 
   setTimeout(() => {
     window.location.href = 'diary.html';
-  }, 3200);
+  }, 3400);
 }
-
+ 
 document.getElementById('pw-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     e.preventDefault();
