@@ -149,9 +149,23 @@
   .post-close:hover{color:rgba(200,220,255,0.45);}  
   
   /* 新月ボタン */  
-  #new-moon-btn{display:none;position:fixed;bottom:30px;right:32px;z-index:30;width:34px;height:34px;border-radius:50%;cursor:pointer;background:radial-gradient(circle at 30% 35%,rgba(30,34,44,0.95),rgba(10,12,18,0.98));border:1px solid rgba(200,220,255,0.10);box-shadow:0 2px 12px rgba(0,0,0,0.50);transition:box-shadow 0.3s,transform 0.3s;-webkit-mask:radial-gradient(circle at 68% 38%,transparent 32%,black 34%);mask:radial-gradient(circle at 68% 38%,transparent 32%,black 34%);}  
-  #new-moon-btn:hover{transform:scale(1.08);}  
-  #new-moon-btn.show{display:block;}  
+  #new-moon-btn {
+    display: none; position: fixed; bottom: 32px; right: 36px; z-index: 30;
+    width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+    background: radial-gradient(circle at 30% 35%, rgba(30,34,44,0.95), rgba(10,12,18,0.98));
+    border: 1px solid rgba(200,220,255,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.50), 0 0 24px rgba(200,220,255,0.05);
+    transition: box-shadow 0.3s, transform 0.3s;
+    /* 新月: 右側だけ少し欠けてる感じ */
+    -webkit-mask: radial-gradient(circle at 68% 38%, transparent 32%, black 34%);
+    mask: radial-gradient(circle at 68% 38%, transparent 32%, black 34%);
+  }
+  #new-moon-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 3px 18px rgba(0,0,0,0.60), 0 0 36px rgba(200,220,255,0.10), 0 0 12px rgba(200,169,58,0.18);
+    border-color: rgba(200,169,58,0.22);
+  }
+  #new-moon-btn.show { display: block; }
   
   #back-top{display:flex;justify-content:center;padding:14px 0 54px;}  
   #back-top-btn{width:13px;height:13px;border-radius:50%;background:rgba(200,220,255,0.22);border:none;cursor:pointer;transition:background 0.3s,transform 0.3s;display:block;}  
