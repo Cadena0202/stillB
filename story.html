@@ -426,6 +426,7 @@ pwInput.addEventListener('change',()=>{
 });  
 document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));  
 document.getElementById('story-modal-delete').addEventListener('click',deleteStory);  
+document.getElementById('story-modal-edit').addEventListener('click',editStory); 
 document.getElementById('new-moon-btn').addEventListener('click',()=>{if(isOwner)document.getElementById('post-modal').classList.add('open');});  
 document.getElementById('post-close').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));  
 document.getElementById('btn-cancel').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));  
