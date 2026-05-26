@@ -322,24 +322,77 @@ async function deleteStory(){
   document.getElementById('post-modal').classList.add('open');
 }
   
-async function postStory(){  
-  if(!isOwner)return;  
-  const title=document.getElementById('story-title-input').value.trim();  
-  const desc=document.getElementById('story-desc-input').value.trim();  
-  const body=document.getElementById('story-body-input').value.trim();  
-  if(!body)return;  
-  const now=new Date();  
-  const date=now.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');  
-  try{  
-    const ref=await addDoc(collection(db,'stories'),{title:title||'— 無題 —',desc,body,date,createdAt:now.getTime()});  
-    allStories.unshift({id:ref.id,title:title||'— 無題 —',desc,body,date,createdAt:now.getTime()});  
-    document.getElementById('story-title-input').value='';  
-    document.getElementById('story-desc-input').value='';  
-    document.getElementById('story-body-input').value='';  
-    document.getElementById('post-modal').classList.remove('open');  
-    renderStories();  
-  }catch(e){alert('投稿に失敗しました。');}  
-}  
+async function postStory(){
+  if(!isOwner)return;
+
+  const title=document.getElementById('story-title-input').value.trim();
+  const desc=document.getElementById('story-desc-input').value.trim();
+  const body=document.getElementById('story-body-input').value.trim();
+
+  if(!body)return;
+
+  const now=new Date();
+  const date=now.toLocaleDateString('ja-JP',{
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).replace(/\//g,'-');
+
+  try{
+
+    if(editingStoryId){
+
+      await updateDoc(doc(db,'stories',editingStoryId),{
+        title:title||'— 無題 —',
+        desc,
+        body,
+        date
+      });
+
+      const target = allStories.find(s=>s.id===editingStoryId);
+
+      if(target){
+        target.title = title||'— 無題 —';
+        target.desc = desc;
+        target.body = body;
+        target.date = date;
+      }
+
+      editingStoryId = null;
+
+    }else{
+
+      const ref=await addDoc(collection(db,'stories'),{
+        title:title||'— 無題 —',
+        desc,
+        body,
+        date,
+        createdAt:now.getTime()
+      });
+
+      allStories.unshift({
+        id:ref.id,
+        title:title||'— 無題 —',
+        desc,
+        body,
+        date,
+        createdAt:now.getTime()
+      });
+    }
+
+    document.getElementById('story-title-input').value='';
+    document.getElementById('story-desc-input').value='';
+    document.getElementById('story-body-input').value='';
+
+    document.getElementById('post-modal').classList.remove('open');
+
+    renderStories();
+
+  }catch(e){
+    console.error(e);
+    alert(e.message);
+  }
+}
   
 // 右上鍵アイコン（オーナー昇格）  
 document.getElementById('lock-icon-btn').addEventListener('click',()=>{  
