@@ -666,7 +666,7 @@ function renderCards() {
     const card = document.createElement('div');
     card.className = 'log-card';
     card.style.animationDelay = `${i * 0.07}s`;
-    const preview = (entry.body || '';
+    const preview = (entry.body || '');
     const dotClass = `dot-${entry.category || 'all'}`;
     card.innerHTML = `
       <div class="card-meta">
