@@ -348,17 +348,45 @@ function checkPassword(){
   }  
 }  
   
-async function loadStories(){  
-  const list=document.getElementById('story-list');  
-  list.innerHTML='<div class="loading-note">— loading —</div>';  
-  try{  
-    const q=query(collection(db,'stories'),orderBy('createdAt','desc'));  
-    const snap=await getDocs(q);  
-    allStories=[];  
-    snap.forEach(d=>allStories.push({id:d.id,...d.data()}));  
-    renderStories();  
-  }catch(e){list.innerHTML='<div class="empty-note">— まだ何も書かれていない —</div>';}  
-}  
+async function loadStories(){
+
+  const list=document.getElementById('story-list');
+
+  list.innerHTML='<div class="loading-note">— loading —</div>';
+
+  try{
+
+    const q=query(
+      collection(db,'stories'),
+      orderBy('createdAt','desc')
+    );
+
+    const [snap] = await Promise.all([
+
+      getDocs(q),
+
+      new Promise(resolve=>setTimeout(resolve,1800))
+
+    ]);
+
+    allStories=[];
+
+    snap.forEach(d=>
+      allStories.push({
+        id:d.id,
+        ...d.data()
+      })
+    );
+
+    renderStories();
+
+  }catch(e){
+
+    list.innerHTML=
+      '<div class="empty-note">— まだ何も書かれていない —</div>';
+
+  }
+}
   
 function renderStories(){  
   const list=document.getElementById('story-list');  
