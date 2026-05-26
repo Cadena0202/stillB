@@ -151,17 +151,6 @@
     <div class="lock-title">enter the password</div>  
     <input class="lock-input" type="password" id="pw-input" placeholder="· · · · · ·" autocomplete="off" />  
     <div class="lock-error" id="pw-error"></div>  
-    
-    <button id="pw-submit" style="
-      background:transparent;
-      border:1px solid rgba(200,220,255,0.18);
-      color:rgba(220,232,255,0.68);
-      padding:6px 18px;
-      font-family:'Cormorant Garamond',serif;
-      letter-spacing:0.18em;
-      cursor:pointer;
-      font-size:11px;
-    ">ENTER</button>
 
     <div class="lock-hint">— ◇　◆　◇ —</div>  
   </div>  
@@ -462,7 +451,6 @@ document.getElementById('post-close').addEventListener('click',()=>document.getE
 document.getElementById('btn-cancel').addEventListener('click',()=>document.getElementById('post-modal').classList.remove('open'));  
 document.getElementById('btn-post').addEventListener('click',postStory);  
 document.getElementById('back-top-btn').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));  
-document.getElementById('pw-submit').addEventListener('click',checkPassword);
 
 document.getElementById('story-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});  
 document.getElementById('post-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});  
