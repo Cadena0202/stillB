@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Remember the promise.</title>
-<link href="fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; background: #0c1019; overflow: hidden; cursor: crosshair; }
@@ -157,7 +157,8 @@ function draw(t) {
 requestAnimationFrame(draw);
 
 // パスワード認証
-const PW = 'remember'; // ← 変えてください
+const READ_PASSWORD  = 'remember'; // 閲覧用
+const WRITE_PASSWORD = 'azul2024'; // 投稿用
 
 function startBubbles(bc) {
   const bctx=bc.getContext('2d');
@@ -200,23 +201,45 @@ function startBubbles(bc) {
 }
 
 function checkPassword() {
-  const val = document.getElementById('pw-input').value;
+  const val = document.getElementById('pw-input').value.trim();
   const err = document.getElementById('pw-error');
-  if (val === PW) {
-    const overlay = document.getElementById('loading-overlay');
-    const bc = document.getElementById('bubble-canvas');
-    overlay.classList.add('active');
-    setTimeout(() => { bc.classList.add('active'); startBubbles(bc); }, 600);
-    setTimeout(() => { window.location.href = 'diary.html'; }, 3200);
-  } else {
+
+  if (val === WRITE_PASSWORD) {
+    sessionStorage.setItem('mode', 'owner');
+    startTransition();
+  }
+  else if (val === READ_PASSWORD) {
+    sessionStorage.setItem('mode', 'reader');
+    startTransition();
+  }
+  else {
     err.textContent = 'the key does not fit.';
     document.getElementById('pw-input').value = '';
     setTimeout(() => { err.textContent = ''; }, 2500);
   }
 }
 
+function startTransition() {
+  const overlay = document.getElementById('loading-overlay');
+  const bc = document.getElementById('bubble-canvas');
+
+  overlay.classList.add('active');
+
+  setTimeout(() => {
+    bc.classList.add('active');
+    startBubbles(bc);
+  }, 600);
+
+  setTimeout(() => {
+    window.location.href = 'diary.html';
+  }, 3200);
+}
+
 document.getElementById('pw-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') checkPassword();
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    checkPassword();
+  }
 });
 </script>
 </body>
