@@ -38,9 +38,20 @@
     border-bottom: 1px solid rgba(200,220,255,0.07); position: relative; z-index: 20;
   }
   .site-title {
-    font-family: 'IM Fell English', serif; font-style: italic;
-    font-size: 14px; color: rgba(210,225,255,0.42); letter-spacing: 0.18em; text-decoration: none;
-  }
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(210,225,255,0.42);
+    letter-spacing: 0.18em;
+    text-decoration: none;
+
+    opacity: 0.05;
+    transition: opacity 0.4s ease;
+}
+
+header:hover .site-title {
+    opacity: 0.22;
+}
   nav { display: flex; gap: 32px; }
   nav a {
     font-family: 'Cormorant Garamond', serif; font-size: 11px;
