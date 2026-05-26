@@ -538,7 +538,7 @@ requestAnimationFrame(draw);
 
 <!-- Firebase + ロジック -->
 <script type="module">
-import { initializeApp } from "www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { initializeApp } from "http://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 
 import {
   getFirestore,
@@ -570,9 +570,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app)
+const auth = getAuth(app);
 
-// ---- 権限取得 ----
+const mode = sessionStorage.getItem('mode');
+
 const navEntries = performance.getEntriesByType("navigation");
 const isReload = navEntries.length && navEntries[0].type === "reload";
 
@@ -580,6 +581,8 @@ if (isReload) {
   sessionStorage.removeItem('mode');
   window.location.href = 'index.html';
 }
+
+let isOwner = false;
 
 onAuthStateChanged(auth, (user) => {
 
@@ -592,6 +595,8 @@ onAuthStateChanged(auth, (user) => {
 
   document.getElementById('main-content').classList.add('visible');
   document.getElementById('new-moon-btn').classList.add('show');
+
+});
 
 });
 
@@ -610,8 +615,6 @@ document.getElementById('main-content').classList.add('visible');
 if (isOwner) {
   document.getElementById('new-moon-btn').classList.add('show');
 }
-
-loadEntries();
 
 function startBubbles(bc) {
   const bctx = bc.getContext('2d');
