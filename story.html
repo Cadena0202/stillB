@@ -8,7 +8,7 @@
 <style>  
   :root { --mustard:#c8a93a; --text:rgba(220,230,245,0.78); --text-dim:rgba(170,190,215,0.48); }  
   *{margin:0;padding:0;box-sizing:border-box;}  
-  html,body{width:100%;min-height:100vh;background:#0c1019;color:var(--text);font-family:'Shippori Mincho',serif;overflow-x:hidden;}  
+  html,body{width:100%;min-height:100dvh;background:#0c1019;color:var(--text);font-family:'Shippori Mincho',serif;overflow-x:hidden;}  
   #bg{position:fixed;inset:0;z-index:0;pointer-events:none;}  
   .corner{position:fixed;width:16px;height:16px;border-style:solid;z-index:50;pointer-events:none;opacity:0.28;}  
   .corner-tl{top:14px;left:14px;border-color:rgba(200,220,255,0.55);border-width:1px 0 0 1px;}  
@@ -17,7 +17,7 @@
   .corner-br{bottom:14px;right:14px;border-color:rgba(200,220,255,0.55);border-width:0 1px 1px 0;}  
   
   /* パスワードオーバーレイ */  
-  #lock-overlay{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(6,10,18,0.96);backdrop-filter:blur(12px);transition:opacity 1s ease;}  
+  #lock-overlay{position:fixed;inset:0;min-height:100dvh;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(6,10,18,0.96);backdrop-filter:blur(12px);transition:opacity 1s ease;}  
   #lock-overlay.hiding{opacity:0;pointer-events:none;}  
   .lock-box{display:flex;flex-direction:column;align-items:center;gap:22px;opacity:0;animation:fadein 1.2s ease 0.3s forwards;}  
   .lock-icon{font-size:22px;opacity:0.30;}  
@@ -29,7 +29,7 @@
   .lock-hint{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:10px;color:rgba(200,220,255,0.16);letter-spacing:0.22em;}  
   
   /* メイン */  
-  #main-content{display:none;position:relative;z-index:10;min-height:100vh;flex-direction:column;}  
+  #main-content{display:none;position:relative;z-index:10;min-height:100dvh;flex-direction:column;}  
   #main-content.visible{display:flex;}  
   
   header{padding:22px 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(200,220,255,0.07);position:relative;z-index:20;}  
@@ -66,6 +66,7 @@
   #story-modal{
   position:fixed;
   inset:0;
+  min-height:100dvh;
   z-index:999;
 
   background:transparent;
