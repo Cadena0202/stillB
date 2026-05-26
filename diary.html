@@ -302,6 +302,34 @@
 
   @keyframes fadein { to { opacity: 1; } }
 
+  #deep-fade{
+  position:fixed;
+  inset:0;
+  z-index:998;
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(12,18,32,0.08) 0%,
+      rgba(8,12,22,0.45) 35%,
+      rgba(3,5,10,0.92) 100%
+    );
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:
+    opacity 1.6s ease,
+    backdrop-filter 1.6s ease;
+
+  backdrop-filter:blur(0px);
+}
+
+#deep-fade.active{
+  opacity:1;
+  backdrop-filter:blur(8px);
+}
+
   /* ===== ローディング（泡） ===== */
   #loading-overlay {
     position: fixed; inset: 0; z-index: 55;
@@ -349,6 +377,7 @@
 </head>
 <body>
 
+<div id="deep-fade"></div>
 <div id="page-fade"></div>
 <canvas id="bg"></canvas>
 <div class="corner corner-tl"></div>
