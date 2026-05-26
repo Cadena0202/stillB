@@ -244,9 +244,6 @@
     transform:translate(-50%,-50%) scale(42);
     filter:blur(22px);
   }
-
-}
-
 }
   
   footer{padding:18px 36px;border-top:1px solid rgba(200,220,255,0.05);display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:10;}  
@@ -403,6 +400,8 @@ function draw(t){
 }  
 requestAnimationFrame(draw);  
 </script>  
+
+<div id="deep-fade"></div>
   
 <script type="module">  
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";  
@@ -472,6 +471,15 @@ async function loadStories(){
         ...d.data()
       })
     );
+const flash = document.getElementById('loading-flash');
+
+if(flash){
+  flash.classList.remove('active');
+
+  void flash.offsetWidth;
+
+  flash.classList.add('active');
+}
 
     renderStories();
 
@@ -625,8 +633,12 @@ pwInput.addEventListener('keydown',e=>{
   }
 });
 
-document.getElementById('story-modal-close').addEventListener('click',()=>document.getElementById('story-modal').classList.remove('open'));
-document.getElementById('deep-fade').classList.remove('active');  
+document.getElementById('story-modal-close').addEventListener('click',()=>{
+
+  document.getElementById('story-modal').classList.remove('open');
+  document.getElementById('deep-fade').classList.remove('active');
+
+});
 document.getElementById('story-modal-delete').addEventListener('click',deleteStory);  
 document.getElementById('story-modal-edit').addEventListener('click',editStory); 
 document.getElementById('new-moon-btn').addEventListener('click',()=>{if(isOwner)document.getElementById('post-modal').classList.add('open');});  
@@ -643,9 +655,6 @@ document.getElementById('story-modal').addEventListener('click',e=>{
 });
 document.getElementById('post-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});  
 </script> 
-  
-  <div id="deep-fade"></div>
-
 </body>
 </html>
 
