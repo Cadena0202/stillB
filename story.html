@@ -51,7 +51,13 @@
   .story-header h1{font-family:'IM Fell English',serif;font-style:italic;font-size:24px;color:rgba(210,225,255,0.62);letter-spacing:0.08em;}  
   .story-header-line{flex:1;height:1px;background:linear-gradient(to right,rgba(200,220,255,0.14),transparent);}  
   
-  .story-list{display:flex;flex-direction:column;gap:0;}  
+  .story-list{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+
+  position:relative;
+}
   .story-item{border-bottom:1px solid rgba(200,220,255,0.07);padding:22px 6px;display:flex;align-items:baseline;gap:20px;cursor:pointer;transition:background 0.25s;opacity:0;transform:translateY(6px);animation:cardrise 0.55s ease forwards;position:relative;}  
   .story-item:hover{background:rgba(200,220,255,0.03);}  
   @keyframes cardrise{to{opacity:1;transform:translateY(0);}}  
@@ -200,7 +206,7 @@
 
   border-radius:50%;
 
-  background:rgba(255,70,70,0.95);
+  background:rgba(255,0,0,0.1);
 
   transform:translate(-50%,-50%) scale(0);
 
@@ -208,9 +214,9 @@
   opacity:0;
 
   box-shadow:
-    0 0 12px rgba(255,70,70,0.9),
-    0 0 32px rgba(255,40,40,0.55),
-    0 0 80px rgba(255,0,0,0.25);
+    0 0 20px rgba(255,0,0,1),
+    0 0 60px rgba(255,0,0,0.8),
+    0 0 140px rgba(255,0,0,0.45);
 
   z-index:20;
 }
