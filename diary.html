@@ -169,7 +169,7 @@
     color: rgba(210,225,255,0.72); letter-spacing: 0.06em; margin-bottom: 22px;
   }
   .modal-body {
-    font-size: 10px; line-height: 2.2; color: rgba(190,210,240,0.60);
+    font-size: 14px; line-height: 2.2; color: rgba(190,210,240,0.60);
     letter-spacing: 0.04em; white-space: pre-wrap;
   }
   .modal-close {
@@ -198,8 +198,7 @@
     cursor:pointer;
     transition:color 0.3s;
     display:none;
-  } 
-  .modal-edit.show { display: inline; }
+}
 
   /* 投稿フォームモーダル */
   #post-modal {
@@ -430,8 +429,8 @@
     <div class="modal-date" id="modal-date"></div>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-body" id="modal-body"></div>
-    <button class="modal-edit" id="modal-edit">edit</button>
     <button class="modal-delete" id="modal-delete">delete</button>
+    <button class="modal-edit" id="modal-edit">edit</button>
   </div>
 </div>
 
@@ -538,19 +537,9 @@ requestAnimationFrame(draw);
 
 <!-- Firebase + ロジック -->
 <script type="module">
-import { initializeApp } from "http://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  updateDoc,
-  doc,
-  orderBy,
-  query
-} from "http://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, orderBy, query }
+  from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",
@@ -565,28 +554,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// ---- 権限取得 ----
 const mode = sessionStorage.getItem('mode');
-
-const navEntries = performance.getEntriesByType("navigation");
-const isReload = navEntries.length && navEntries[0].type === "reload";
-
-if (isReload) {
-  sessionStorage.removeItem('mode');
-  window.location.href = 'index.html';
-}
-
-let isOwner = mode === 'owner';
 
 if (!mode) {
   window.location.href = 'index.html';
 }
 
-document.getElementById('main-content').classList.add('visible');
-
-if (isOwner) {
-  document.getElementById('new-moon-btn').classList.add('show');
-}
-
+let isOwner = mode === 'owner';
 let allEntries = [];
 let currentCat = 'all';
 let currentEntryId = null;
@@ -601,6 +576,8 @@ document.getElementById('main-content').classList.add('visible');
 if (isOwner) {
   document.getElementById('new-moon-btn').classList.add('show');
 }
+
+loadEntries();
 
 function startBubbles(bc) {
   const bctx = bc.getContext('2d');
