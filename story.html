@@ -235,7 +235,7 @@ const app=initializeApp(firebaseConfig),db=getFirestore(app);
 const READ_PW  = 'story';      // 読む用（変えてください）  
 const WRITE_PW = 'azul2024';   // 書く用（変えてください）  
   
-let isOwner=false, allStories=[], currentStoryId=null;  
+let isOwner=false, allStories=[], currentStoryId=null, editingStoryId=null;  
   
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}  
   
