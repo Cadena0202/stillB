@@ -556,6 +556,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ---- 権限取得 ----
+const navEntries = performance.getEntriesByType("navigation");
+const isReload = navEntries.length && navEntries[0].type === "reload";
+
+if (isReload) {
+  sessionStorage.removeItem('mode');
+  window.location.href = 'index.html';
+}
+
 const mode = sessionStorage.getItem('mode');
 
 if (!mode) {
