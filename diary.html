@@ -860,9 +860,23 @@ window.addEventListener('load', () => {
   }, 200);
 });
   // リロード・タブ閉じで再認証
-window.addEventListener('beforeunload', () => {
+function clearAuth() {
   sessionStorage.removeItem('mode');
+}
+
+// PC
+window.addEventListener('beforeunload', clearAuth);
+
+// iPhone / Android
+window.addEventListener('pagehide', clearAuth);
+
+// Safari復帰対策
+window.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    clearAuth();
+  }
 });
+
   
 </script>
 
