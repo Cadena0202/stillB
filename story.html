@@ -218,6 +218,12 @@
 .loading-flash.active{
   animation:redPulse 1.1s ease forwards;
 }
+  .story-wrap.flash{
+
+  filter:
+    drop-shadow(0 0 18px rgba(255,40,40,0.18));
+
+}
 
 @keyframes redPulse{
 
@@ -479,6 +485,13 @@ if(flash){
   void flash.offsetWidth;
 
   flash.classList.add('active');
+  const wrap=document.querySelector('.story-wrap');
+
+wrap.classList.add('flash');
+
+setTimeout(()=>{
+  wrap.classList.remove('flash');
+},700);
 }
 
     renderStories();
