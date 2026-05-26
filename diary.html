@@ -468,15 +468,15 @@ function draw(t) {
   ctx.clearRect(0, 0, W, H);
 
   const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0,    '#1c2436');
+  bg.addColorStop(0,    '#2a3952');
   bg.addColorStop(0.38, '#141c2c');
-  bg.addColorStop(0.70, '#0e1622');
+  bg.addColorStop(0.70, '#101a2b');
   bg.addColorStop(1,    '#070b12');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-  const ml = ctx.createRadialGradient(W*0.5, H*0.12, 0, W*0.5, H*0.35, W*0.55);
-  ml.addColorStop(0,   'rgba(200,218,255,0.10)');
-  ml.addColorStop(0.6, 'rgba(180,205,255,0.04)');
+  const ml = ctx.createRadialGradient(W*0.5, H*0.02, 0, W*0.5, H*0.28, W*0.75);
+  ml.addColorStop(0,   'rgba(220,235,255,0.18');
+  ml.addColorStop(0.5, 'rgba(190,215,255,0.08)');
   ml.addColorStop(1,   'transparent');
   ctx.fillStyle = ml; ctx.fillRect(0, 0, W, H);
 
