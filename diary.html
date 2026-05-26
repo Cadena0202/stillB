@@ -30,7 +30,6 @@
   .corner-bl { bottom: 14px; left: 14px;  border-color: rgba(200,220,255,0.50); border-width: 0 0 1px 1px; }
   .corner-br { bottom: 14px; right: 14px; border-color: rgba(200,220,255,0.50); border-width: 0 1px 1px 0; }
 
-  /* ===== メインコンテンツ ===== */
   #main-content { display: none; position: relative; z-index: 10; min-height: 100vh; flex-direction: column; }
   #main-content.visible { display: flex; }
 
@@ -508,7 +507,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---- 権限 ----
+// ---- 権限取得 ----
 const mode = sessionStorage.getItem('mode');
 
 if (!mode) {
@@ -524,15 +523,89 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function initializePage() {
-  document.getElementById('main-content').classList.add('visible');
+document.getElementById('main-content').classList.add('visible');
 
-  if (isOwner) {
-    document.getElementById('new-moon-btn').classList.add('show');
+if (isOwner) {
+  document.getElementById('new-moon-btn').classList.add('show');
+}
+
+loadEntries();
+
+function startBubbles(bc) {
+  const bctx = bc.getContext('2d');
+  bc.width  = window.innerWidth;
+  bc.height = window.innerHeight;
+  const BW = bc.width, BH = bc.height;
+
+  const bubbles = Array.from({length: 38}, (_, i) => ({
+    x: Math.random() * BW,
+    y: BH + Math.random() * 80 + 20,
+    r: Math.random() * 10 + 4,
+    speed: Math.random() * 2.2 + 1.0,
+    alpha: Math.random() * 0.35 + 0.12,
+    wobble: Math.random() * Math.PI * 2,
+    wobbleAmp: Math.random() * 1.8 + 0.5,
+    delay: i * 55,
+    born: false,
+    startTime: null,
+  }));
+
+  let startTime = null;
+  let running = true;
+
+  function animBubbles(ts) {
+    if (!running) return;
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    bctx.clearRect(0, 0, BW, BH);
+
+    for (const b of bubbles) {
+      if (!b.born && elapsed < b.delay) continue;
+      if (!b.born) { b.born = true; b.startTime = ts; }
+
+      const age = ts - b.startTime;
+      b.y -= b.speed;
+      b.wobble += 0.03;
+      const bx = b.x + Math.sin(b.wobble) * b.wobbleAmp;
+
+      if (b.y + b.r < 0) {
+        b.y = BH + b.r;
+        b.x = Math.random() * BW;
+      }
+
+      // 泡の描画
+      const grad = bctx.createRadialGradient(bx - b.r*0.3, b.y - b.r*0.3, b.r*0.1, bx, b.y, b.r);
+      grad.addColorStop(0,   `rgba(220,235,255,${b.alpha * 0.6})`);
+      grad.addColorStop(0.5, `rgba(180,210,255,${b.alpha * 0.25})`);
+      grad.addColorStop(1,   `rgba(140,185,240,${b.alpha * 0.08})`);
+
+      bctx.beginPath();
+      bctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
+      bctx.fillStyle = grad;
+      bctx.fill();
+
+      // 縁
+      bctx.beginPath();
+      bctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
+      bctx.strokeStyle = `rgba(200,225,255,${b.alpha * 0.40})`;
+      bctx.lineWidth = 0.7;
+      bctx.stroke();
+
+      // 光沢
+      bctx.beginPath();
+      bctx.arc(bx - b.r*0.28, b.y - b.r*0.28, b.r*0.22, 0, Math.PI*2);
+      bctx.fillStyle = `rgba(255,255,255,${b.alpha * 0.45})`;
+      bctx.fill();
+    }
+
+    if (elapsed < 2600) requestAnimationFrame(animBubbles);
+    else { bctx.clearRect(0,0,BW,BH); running = false; }
   }
 
-  loadEntries();
+  requestAnimationFrame(animBubbles);
 }
+
+
 
 async function loadEntries() {
   const grid = document.getElementById('card-grid');
@@ -627,7 +700,6 @@ document.querySelectorAll('.cat-btn').forEach(btn => {
 });
 
 // イベントリスナー
-});
 document.getElementById('modal-close').addEventListener('click', () => document.getElementById('detail-modal').classList.remove('open'));
 document.getElementById('modal-delete').addEventListener('click', deleteCurrentEntry);
 document.getElementById('new-moon-btn').addEventListener('click', () => document.getElementById('post-modal').classList.add('open'));
@@ -639,10 +711,6 @@ document.getElementById('back-top-btn').addEventListener('click', () => window.s
 // モーダル外クリックで閉じる
 document.getElementById('detail-modal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 document.getElementById('post-modal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
-
-// 初期化
-initializePage();
-
 </script>
 
 </body>
