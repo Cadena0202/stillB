@@ -298,13 +298,16 @@ function openStory(s){
   document.getElementById('story-modal-meta').textContent=s.date||'';  
   document.getElementById('story-modal-body').textContent=s.body||'';  
   const del=document.getElementById('story-modal-delete');
-const edit=document.getElementById('story-modal-edit');
+  const edit=document.getElementById('story-modal-edit');
 if(isOwner){
   del.classList.add('show');
   edit.classList.add('show');
 }else{
   del.classList.remove('show');
   edit.classList.remove('show');
+}
+  
+document.getElementById('story-modal').classList.add('open');
 }
   
 async function deleteStory(){  
