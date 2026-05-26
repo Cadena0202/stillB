@@ -698,17 +698,25 @@ function renderCards() {
 
 function openDetail(entry) {
   currentEntryId = entry.id;
+
   document.getElementById('modal-date').textContent = entry.date || '';
   document.getElementById('modal-title').textContent = entry.title || '— 無題 —';
   document.getElementById('modal-body').textContent = entry.body || '';
-  const del=document.getElementById('modal-delete');
-  const edit=document.getElementById('modal-edit');
-if(isOwner){
-  del.classList.add('show');
-  edit.classList.add('show');
-}else{
-  del.classList.remove('show');
-  edit.classList.remove('show');
+
+  const del = document.getElementById('modal-delete');
+  const edit = document.getElementById('modal-edit');
+
+  if (isOwner) {
+    del.classList.add('show');
+    edit.classList.add('show');
+  } else {
+    del.classList.remove('show');
+    edit.classList.remove('show');
+  }
+
+  edit.onclick = () => openEdit(entry);
+
+  document.getElementById('detail-modal').classList.add('open');
 }
   
 function openEdit(entry) {
@@ -717,7 +725,6 @@ function openEdit(entry) {
   document.getElementById('entry-title-input').value = entry.title || '';
   document.getElementById('entry-body-input').value = entry.body || '';
   document.getElementById('entry-cat-input').value = entry.category || 'all';
-
   document.getElementById('detail-modal').classList.remove('open');
   document.getElementById('post-modal').classList.add('open');
 }
@@ -735,22 +742,66 @@ async function deleteCurrentEntry() {
 
 async function postEntry() {
   if (!isOwner) return;
+
   const title = document.getElementById('entry-title-input').value.trim();
   const body  = document.getElementById('entry-body-input').value.trim();
   const cat   = document.getElementById('entry-cat-input').value;
+
   if (!body) return;
+
   const now = new Date();
-  const date = now.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  const date = now.toLocaleDateString('ja-JP',{
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).replace(/\//g,'-');
+
   try {
-    const docRef = await addDoc(collection(db,'entries'), {
-      title: title||'— 無題 —', body, date, category: cat, createdAt: now.getTime()
-    });
-    allEntries.unshift({ id: docRef.id, title: title||'— 無題 —', body, date, category: cat, createdAt: now.getTime() });
+
+    if (currentEditingId) {
+
+      await updateDoc(doc(db,'entries',currentEditingId), {
+        title: title || '— 無題 —',
+        body,
+        category: cat
+      });
+
+      const target = allEntries.find(e => e.id === currentEditingId);
+
+      if (target) {
+        target.title = title || '— 無題 —';
+        target.body = body;
+        target.category = cat;
+      }
+
+      currentEditingId = null;
+
+    } else {
+
+      const docRef = await addDoc(collection(db,'entries'), {
+        title: title || '— 無題 —',
+        body,
+        date,
+        category: cat,
+        createdAt: now.getTime()
+      });
+      allEntries.unshift({
+        id: docRef.id,
+        title: title || '— 無題 —',
+        body,
+        date,
+        category: cat,
+        createdAt: now.getTime()
+      });
+    }
     document.getElementById('entry-title-input').value = '';
     document.getElementById('entry-body-input').value = '';
     document.getElementById('post-modal').classList.remove('open');
     renderCards();
-  } catch(e) { alert('投稿に失敗しました。'); }
+  } catch(e) {
+    alert('投稿に失敗しました。');
+    console.error(e);
+  }
 }
 
 // カテゴリフィルター
@@ -766,7 +817,6 @@ document.querySelectorAll('.cat-btn').forEach(btn => {
 // イベントリスナー
 document.getElementById('modal-close').addEventListener('click', () => document.getElementById('detail-modal').classList.remove('open'));
 document.getElementById('modal-delete').addEventListener('click', deleteCurrentEntry);
-document.getElementById('modal-edit').addEventListener('click',modal-edit);
 document.getElementById('new-moon-btn').addEventListener('click', () => document.getElementById('post-modal').classList.add('open'));
 document.getElementById('post-close').addEventListener('click', () => document.getElementById('post-modal').classList.remove('open'));
 document.getElementById('btn-cancel').addEventListener('click', () => document.getElementById('post-modal').classList.remove('open'));
