@@ -252,7 +252,7 @@ function draw(t){
   ctx.fillStyle = noise;
   ctx.fillRect(0,0,W,H);
   const bg=ctx.createLinearGradient(0,0,0,H);  
-  bg.addColorStop(0,'#1a2130');bg.addColorStop(0.5,'#111822');bg.addColorStop(1,'#070b12');  
+  bg.addColorStop(0,'#0a1018');bg.addColorStop(0.5,'#05080f');bg.addColorStop(1,'#000000');  
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);  
   for(const p of SNOW){p.y-=p.speed;p.wobble+=p.ws;if(p.y<-0.02){p.y=1.02;p.x=Math.random();}  
     const px=(p.x+Math.sin(p.wobble)*0.013)*W,py=p.y*H;  
