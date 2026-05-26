@@ -288,18 +288,6 @@
     text-align: center; padding: 60px 0; grid-column: 1 / -1;
   }
 
-  footer {
-    padding: 20px 40px; border-top: 1px solid rgba(200,220,255,0.05);
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-  }
-  .footer-line { flex: 1; max-width: 90px; height: 1px; }
-  .footer-line.blue { background: linear-gradient(to right, transparent, rgba(200,220,255,0.14)); }
-  .footer-line.gold { background: linear-gradient(to left,  transparent, rgba(200,169,58,0.14)); }
-  .footer-text {
-    font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 10px; color: rgba(160,185,220,0.20); letter-spacing: 0.20em;
-  }
-
   @keyframes fadein { to { opacity: 1; } }
 
   #deep-fade{
@@ -678,7 +666,7 @@ function renderCards() {
     const card = document.createElement('div');
     card.className = 'log-card';
     card.style.animationDelay = `${i * 0.07}s`;
-    const preview = (entry.body || '').slice(0, 40);
+    const preview = (entry.body || '';
     const dotClass = `dot-${entry.category || 'all'}`;
     card.innerHTML = `
       <div class="card-meta">
