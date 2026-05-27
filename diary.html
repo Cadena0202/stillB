@@ -171,6 +171,10 @@ header:hover .site-title {
     position: relative;
     max-height: 80vh; overflow-y: auto;
   }
+
+#password-modal{
+  display:none;
+}
   /* スクロールバー */
 .modal-inner::-webkit-scrollbar{
     width:6px;
@@ -234,10 +238,6 @@ header:hover .site-title {
 
 .modal-edit.show{
     display:inline;
-}
-
-.modal-edit:hover{
-    color:rgba(235,242,255,0.72);
 }
 
   /* 投稿フォームモーダル */
@@ -496,6 +496,30 @@ header:hover .site-title {
       <button class="btn-post" id="btn-post">Post</button>
     </div>
   </div>
+  .modal-edit:hover{
+    color:rgba(235,242,255,0.72);
+}
+  <!-- パスワードモーダル -->
+<div id="password-modal">
+
+  <div class="password-inner">
+
+    <div class="password-label">
+      enter password
+    </div>
+
+    <input
+      type="password"
+      id="password-input"
+      placeholder="••••••"
+    >
+
+    <button id="password-submit">
+      enter
+    </button>
+
+  </div>
+
 </div>
 
 <!-- 新月ボタン（オーナー投稿用） -->
